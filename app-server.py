@@ -4,7 +4,7 @@ from datetime import datetime
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 CREATION_DATE = datetime.now()
 
 class Server:
@@ -22,7 +22,7 @@ class Server:
             case "info": 
                 return {"info": f"Server version: {VERSION}"}
             case "help": 
-                 return {"help": "Aviable command:\n'uptime'-return life time of server\n'info'-informs about serber version\n'stop'-close the server"}
+                 return {"help": "Available command:\n'uptime'-return life time of server\n'info'-informs about server version\n'stop'-close the server"}
             case "stop": 
                 pass
             case _: #deafult case

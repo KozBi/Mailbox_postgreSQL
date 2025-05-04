@@ -4,7 +4,7 @@ import json
 HOST = "127.0.0.1"  # The server hostname or IP address
 PORT = 65432  # The port used by the server
 
-class Clinet:
+class Client:
     def __init__(self):
         pass
 
@@ -22,7 +22,7 @@ class Clinet:
                 s.sendall(command.encode('utf-8'))
                 data = s.recv(1024)
                 response = json.loads(data.decode('utf-8'))
-                if not command == "stop":
+                if command != "stop":
                     print(self.handle_response(response))
                 else:                    
                     print ("Server has benn closed")
@@ -30,5 +30,5 @@ class Clinet:
                 
 
 if __name__=="__main__":
-    client=Clinet()
+    client=Client()
     client.start_clinet()
