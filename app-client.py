@@ -9,7 +9,7 @@ class Client:
         pass
 
     def handle_response(self,rspse):
-        for value in rspse.values():
+        for value in rspse.values(): #get values from dic
             return value
 
 
