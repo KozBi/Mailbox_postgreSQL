@@ -1,7 +1,7 @@
 import socket
 import json
 from datetime import datetime
-from login import Login_menager
+from my_classes.User_menage import User_menager
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
@@ -10,18 +10,32 @@ CREATION_DATE = datetime.now()
 
 class Server:
     def __init__(self):
-        self.login=Login_menager()
+        self.User=User_menager()
 
     response=None
     
-    help_txt_js={"help": "Available command:\n'uptime'-return life time of server\n'info'-informs about server version\n'stop'-close the server"}
+    help_txt_js={"help": "Available command:\n"
+    "'uptime'-return life time of server\n"
+    "'info'-informs about server version\n'stop'-close the server"
+    "\nlogin --your_login-- login to your account."
+    "\ncreate _login_ _password_ - a new account create with a passowrd"}
 
     def handle_command_dic(self,cmd):
 
-                        # check login
-        parts=cmd.strip().split()
-        if len(parts)==2 and parts[0]== "login":          
-            return self.login.check_login(parts[2])
+        # check create a new user
+        parts=cmd.split() #split string
+        if len(parts)==3 and parts[0]== "create":  # if 2 strings and first "login" check user in json file        
+            return self.User.create_user(parts[1], parts[2])
+        
+        # check login
+        if not self.User.pending_user:
+            parts=cmd.split() #split string
+            if len(parts)==2 and parts[0]== "login":  # if 2 strings and first "login" check user in json file        
+                return self.User.check_login(parts[1])
+            
+        # check passowrd
+        if self.User.pending_user:     
+                return self.User.check_passowrd(cmd)
         
         match str(cmd):
             case "uptime": 

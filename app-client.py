@@ -9,9 +9,11 @@ class Client:
         pass
 
     def handle_response(self,rspse):
-        for value in rspse.values(): #get values from dic
-            return value
-
+        if type(rspse) == str:
+            return rspse
+        if type(rspse) == dict:
+            for value in rspse.values(): #get values from dic
+                return value
 
     def start_clinet(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
