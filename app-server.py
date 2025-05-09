@@ -11,8 +11,9 @@ CREATION_DATE = datetime.now()
 class Server:
     def __init__(self):
         self.User=User_menager()
-
+        self.commands ={    }
     response=None
+
     
     help_txt_js={"help": "Available command:\n"
     "'uptime'-return life time of server\n"
@@ -20,22 +21,11 @@ class Server:
     "\nlogin --your_login-- login to your account."
     "\ncreate _login_ _password_ - a new account create with a passowrd"}
 
-    def handle_command_dic(self,cmd):
-
-        # check create a new user
-        parts=cmd.split() #split string
-        if len(parts)==3 and parts[0]== "create":  # if 2 strings and first "login" check user in json file        
-            return self.User.create_user(parts[1], parts[2])
+    def handle_command(self,cmd):
         
-        # check login
-        if not self.User.pending_user:
-            parts=cmd.split() #split string
-            if len(parts)==2 and parts[0]== "login":  # if 2 strings and first "login" check user in json file        
-                return self.User.check_login(parts[1])
-            
-        # check passowrd
-        if self.User.pending_user:     
-                return self.User.check_passowrd(cmd)
+        user_respond= self.User.handle_user_command(cmd)
+        if user_respond:
+            return user_respond
         
         match str(cmd):
             case "uptime": 
@@ -47,7 +37,7 @@ class Server:
             case "info": 
                 return f"Server version: {VERSION}"
             case "help": 
-                 return self.help_txt_js
+                    return self.help_txt_js
             case "stop": 
                 pass
             case _: #deafult case
@@ -67,7 +57,7 @@ class Server:
                     if not data:
                         break
                     command = data.decode('utf-8') # receive from client a task
-                    self.response = self.handle_command_dic(command)
+                    self.response = self.handle_command(command)
                     conn.sendall(json.dumps(self.response).encode('utf-8'))
                     
                     if command == "stop":
