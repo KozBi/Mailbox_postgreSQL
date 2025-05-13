@@ -1,0 +1,24 @@
+{
+  "Iga": [
+    {
+      "id": 1,
+      "from": "Pawe\u0142",
+      "content": "Hello Iga tu Pawe\u0142"
+    },
+    {
+      "id": 2,
+      "from": "Damian",
+      "content": "Hello Iga tu Damian"
+    },
+    {
+      "id": 3,
+      "from": "Pawe\u0142",
+      "content": "Hello Iga tu Pawe\u0142"
+    },
+    {
+      "id": 4,
+      "from": "Damian",
+      "content": "Hello Iga tu Damian"
+    }
+  ]
+}
