@@ -2,8 +2,20 @@
   "Iga": [
     {
       "id": 1,
-      "from": "Pawe\u0142",
-      "content": "Hello Iga tu Pawe\u0142"
+      "from": "Paweł",
+      "content": "Hello Iga tu Paweł"
+    },
+    {
+      "id": 2,
+      "from": "Damian",
+      "content": "Hello Iga tu Damian"
+    }
+  ],
+  "Sylwek": [
+    {
+      "id": 1,
+      "from": "Paweł",
+      "content": "Hello Iga tu Paweł"
     },
     {
       "id": 2,
@@ -12,8 +24,8 @@
     },
     {
       "id": 3,
-      "from": "Pawe\u0142",
-      "content": "Hello Iga tu Pawe\u0142"
+      "from": "Paweł",
+      "content": "Hello Iga tu Paweł"
     },
     {
       "id": 4,

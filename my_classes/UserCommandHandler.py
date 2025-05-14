@@ -7,31 +7,32 @@ class UserCommandHandler:
       
         parts=cmd.split() #split string
 
-        #check pennding password in account create process
-        if self.UserMenager.pending_cr_password:
-            return self.UserMenager.create_user_passw(cmd)
+        if not self.UserMenager.logged_user:
+
+            #check pennding password in account create process
+            if self.UserMenager.pending_cr_password:
+                return self.UserMenager.create_user_passw(cmd)
+                
+            # check create a new user
+            if len(parts)==3 and parts[0]== "create":  # if 3 strings and first "create" check user in json file        
+                return self.UserMenager.create_user(parts[1], parts[2])
             
-        # check create a new user
-        if len(parts)==3 and parts[0]== "create":  # if 3 strings and first "create" check user in json file        
-            return self.UserMenager.create_user(parts[1], parts[2])
-        
-        # check login
-        if not self.UserMenager.pending_user:
-            parts=cmd.split() #split string
-            if len(parts)==2 and parts[0]== "login":  # if 2 strings and first "login" check user in json file        
-                return self.UserMenager.check_login(parts[1])
-            
-        # check password
-        if self.UserMenager.pending_user:     
-                return self.UserMenager.check_password(cmd) 
+            # check login
+            if not self.UserMenager.pending_user:
+                parts=cmd.split() #split string
+                if len(parts)==2 and parts[0]== "login":  # if 2 strings and first "login" check user in json file        
+                    return self.UserMenager.check_login(parts[1])
+                
+            # check password
+            if self.UserMenager.pending_user:     
+                    return self.UserMenager.check_password(cmd) 
         
         if parts[0]=="logout":
             self.UserMenager.logout()
             return "You have been succesfully logout"
         
         # command not related to this class
-        else:
-            return None     
+        return None     
 
     def status(self):
         return self.UserMenager.status()

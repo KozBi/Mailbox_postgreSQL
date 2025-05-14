@@ -1,9 +1,22 @@
-{
-  "Adam": "adam1",
-  "Pawel": "pawel1",
-  "Adrian": "adrian1",
-  "Sylwek": "sylwek1",
-  "Tomek": "tomek1",
-  "Mati": "mati1",
-  "Adam3": "321"
-}
+[
+  {
+    "id": 1,
+    "username": "adam1"
+  },
+  {
+    "id": 2,
+    "username": "adam2"
+  },
+  {
+    "id": 3,
+    "username": "adam3"
+  },
+  {
+    "id": 4,
+    "username": "adam4"
+  },
+  {
+    "id": 5,
+    "username": "adam5"
+  }
+]

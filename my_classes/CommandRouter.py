@@ -7,7 +7,7 @@ class CommandRouter:
         self.Version=Version
         self.Creationdate=Creationdate
         self.UserCommandHandler= UserCommandHandler()
-        self.MessagingService=MessagingService()
+        self.MessagingService=MessagingService("Jsondata/Messages.json")
 
     
     def _help(self):
@@ -24,7 +24,7 @@ class CommandRouter:
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         " |Commands  If you are LOGIN IN |\n"
         "'msg' check how many messages you have\n" 
-        "'wrt' write a message to another user\n" 
+        "'w' write a message to another user\n" 
         "'rd' read all message\n" 
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         }
@@ -35,14 +35,15 @@ class CommandRouter:
         # if login add also information how many messages already loged user has.
         user_respond= self.UserCommandHandler.handle_user_command(cmd)
         if user_respond and self.UserCommandHandler.UserMenager.logged_user:
-            return f"{user_respond}, You have {self.MessagingService.check_num_message(self.UserCommandHandler.UserMenager.logged_user)} mesagges"
+            return f"{user_respond}, You have {self.MessagingService.number_message(self.UserCommandHandler.UserMenager.logged_user)} mesagges"
         if user_respond:
             return user_respond
         
-        # hanlde commands from class Messages
-        message_respond=self.MessagingService.handel_message_command(cmd, self.UserCommandHandler.UserMenager.logged_user)
-        if message_respond:
-            return message_respond
+        # hanlde commands from class Messages only if user is loged
+        if self.UserCommandHandler.UserMenager.logged_user:
+            message_respond=self.MessagingService.handel_message_command(cmd, self.UserCommandHandler.UserMenager.logged_user)
+            if message_respond:
+                return message_respond
         
         match str(cmd):
             case "uptime": 
@@ -58,4 +59,4 @@ class CommandRouter:
             case "stop": 
                 pass
             case _: #deafult case
-                return "Uknown command, try 'help'"
+                return "Uknown command, try 'help"
