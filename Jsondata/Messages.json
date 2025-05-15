@@ -1,35 +1,11 @@
 {
-  "Iga": [
+  "1": [
     {
-      "id": 1,
-      "from": "Paweł",
+      "from": 2,
       "content": "Hello Iga tu Paweł"
     },
     {
-      "id": 2,
-      "from": "Damian",
-      "content": "Hello Iga tu Damian"
-    }
-  ],
-  "Sylwek": [
-    {
-      "id": 1,
-      "from": "Paweł",
-      "content": "Hello Iga tu Paweł"
-    },
-    {
-      "id": 2,
-      "from": "Damian",
-      "content": "Hello Iga tu Damian"
-    },
-    {
-      "id": 3,
-      "from": "Paweł",
-      "content": "Hello Iga tu Paweł"
-    },
-    {
-      "id": 4,
-      "from": "Damian",
+      "from": 3,
       "content": "Hello Iga tu Damian"
     }
   ]

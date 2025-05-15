@@ -34,14 +34,15 @@ class CommandRouter:
         # hanlde commands from class User
         # if login add also information how many messages already loged user has.
         user_respond= self.UserCommandHandler.handle_user_command(cmd)
-        if user_respond and self.UserCommandHandler.UserMenager.logged_user:
-            return f"{user_respond}, You have {self.MessagingService.number_message(self.UserCommandHandler.UserMenager.logged_user)} mesagges"
+        if user_respond and self.UserCommandHandler.UserMenager.logged_user_id:
+            return f"{user_respond},{self.MessagingService.number_message(self.UserCommandHandler.UserMenager.logged_user_id)}"
         if user_respond:
             return user_respond
         
         # hanlde commands from class Messages only if user is loged
-        if self.UserCommandHandler.UserMenager.logged_user:
-            message_respond=self.MessagingService.handel_message_command(cmd, self.UserCommandHandler.UserMenager.logged_user)
+        if self.UserCommandHandler.UserMenager.logged_user_id:
+            # call handle message (command,loged user , send a class to get posibility to get_user_id)
+            message_respond=self.MessagingService.handle_message_command(cmd, self.UserCommandHandler.UserMenager.logged_user_id, self.UserCommandHandler.UserMenager)
             if message_respond:
                 return message_respond
         

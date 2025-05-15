@@ -16,22 +16,24 @@ class MessagingService():
                 except: return 1
 
 
-    def number_message(self,username):
+    def number_message(self,user_id):
         with open(self.file, mode="r", encoding="utf-8") as f:
             file=json.load(f)
-            try:
-                file_u=file[username]
-                return f"You have {(len(file_u))} messages" 
-            except: "No messages"
+           # try:
+            file_u=file[str(user_id)]
+            return f"You have {(len(file_u[user_id]))} messages" 
+         #   except: return "|Error file reading|"
 
-    def read_message_all(self,username):
+    def read_message_all(self,user_id,umenager):
         with open(self.file, mode="r", encoding="utf-8") as f:
                 messages=json.load(f)
-                msgs=""
                 try:
-                    for list_element in  messages[username]:       
-                        msgs+= f"Message number:{list_element['id']} from {list_element['from']}: {list_element['content']}\n"            
-                    return print(msgs)    
+                    msgs=""
+                    u_message=messages[str(user_id)]
+                    for _numb,t_dict in  enumerate(u_message):    
+                       #String concatenation 
+                        msgs+= f"Message number:{_numb+1} from {umenager.get_user_by_id((t_dict ['from']))}: {t_dict ['content']}\n"            
+                    return msgs   
                 except: print("empty")
         
     def write_message(self,username,receiver,message):
@@ -64,27 +66,27 @@ class MessagingService():
             except: return f"Message {id} cannot be been deleted. Please conntact KozBi"
 
 
-    def handel_message_command(self,cmd,username):
+    def handle_message_command(self,cmd,user_id,UserMenage):
         parts=cmd.split() #split string
         
-        if parts[0]=="msg" and username:
-            return f"Nummber of messages for {username} : {self.number_message(username)}"
+        if parts[0]=="msg" and user_id:
+            return f"Nummber of messages for {user_id} : {self.number_message(user_id)}"
         
-        # if (parts[0]=="msg" or parts[0]=="r" or parts[0]=="w" or parts[0]=="del" ) and not username:
+        # if (parts[0]=="msg" or parts[0]=="r" or parts[0]=="w" or parts[0]=="del" ) and not user_id:
         #     return "Plase login"
         
-        if parts[0]=="r":
-            return self.read_message_all(username)
+        if parts[0]=="rd":
+            return self.read_message_all(user_id,UserMenage)
         
         if parts[0]=="w":
             try:
-                return self.write_message(username,parts[1],parts[2])
+                return self.write_message(user_id,parts[1],parts[2])
             except:
                 return "You are missing receiver or message text."
         
         if parts[0]=="del":
             try:   
-                return self.delete_message(username,parts[1])
+                return self.delete_message(user_id,parts[1])
             except: return "Wrong parametr with command 'del', please inster message number also"
         else:
             return None

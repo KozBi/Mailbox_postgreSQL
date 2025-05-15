@@ -11,6 +11,7 @@ class UserMenager():
         self.pending_cr_user_id = None #on fucntion create -> pending user name id
         self.pending_cr_password = None #on fucntion create -> insert sencond time passoword
         self.logged_user= None # already login user
+        self.logged_user_id= None # already login user
         self.logged_admin= None # already login user
 
     userfile="Jsondata/Users.json"
@@ -21,6 +22,17 @@ class UserMenager():
     def _hash_password(password):
         return hashlib.sha256(password.encode()).hexdigest()
     
+    def get_user_by_id(self,id):
+         with open(self.userfile, mode="r", encoding="utf-8") as u:
+            users = json.load(u)
+            for user in users:
+                if user["id"]==id:
+                    return user["username"]
+
+            print("get_user_id no Value") 
+            return None
+    
+
     def create_user(self,name, password):
         with open(self.userfile, mode="r", encoding="utf-8") as u:
             users = json.load(u)
@@ -109,6 +121,7 @@ class UserMenager():
                 if pw["user_id"]==self.pending_user_id:
                     if pw["pass"]==self._hash_password(pasw):
                         self.logged_user=self.pending_user # fully authenticated user
+                        self.logged_user_id=self.pending_user_id # fully authenticated user
                         self.pending_user = None  # login in progress
                         self.pending_user_id = None  # login in progress
                         return f"You are login as {self.logged_user}"
@@ -118,6 +131,7 @@ class UserMenager():
 
     def logout(self):
         self.logged_user= None
+        self.logged_user_id= None
         return "User succesfully logout"
                   
 
