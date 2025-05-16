@@ -1,10 +1,11 @@
 import json
 
-userfile="Jsondata/Users.json"
+file="Jsondata/Messages.json"
 
-name ="Adam"
-with open(userfile, mode="r", encoding="utf-8") as read_file:
-    fusers = json.load(read_file)
-    if name in [user["username"] for user in fusers]:
-        print("User already exists, try another name")
-    else:print("User free")    
+with open(file, mode="r+", encoding="utf-8") as f:
+            messages_file= json.load(f)
+            #check if key exist
+            new={}
+            if "1" in messages_file:
+                    print(" user find")
+            else: print("No user findx")

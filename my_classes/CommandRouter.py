@@ -22,9 +22,9 @@ class CommandRouter:
         "'logout' you logout from your account\n"
         "'create |login password| - a new account create with a passowrd\n"
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
-        " |Commands  If you are LOGIN IN |\n"
+        " |Commands  If you are LOGGED IN in ohter case command is unknow|\n"
         "'msg' check how many messages you have\n" 
-        "'w' write a message to another user\n" 
+        "'w' 'receiver' write a message to another user\n" 
         "'rd' read all message\n" 
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         }

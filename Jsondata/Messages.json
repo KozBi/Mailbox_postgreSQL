@@ -1,12 +1,35 @@
 {
   "1": [
     {
+      "id_msg": 1,
       "from": 2,
       "content": "Hello Iga tu Paweł"
     },
     {
+      "id_msg": 123,
       "from": 3,
       "content": "Hello Iga tu Damian"
+    }
+  ],
+  "2": [
+    {
+      "id_msg": 1,
+      "from": 1,
+      "content": "hello adam2 tu adam1"
+    }
+  ],
+  "3": [
+    {
+      "id_msg": 1,
+      "from": 1,
+      "content": "hello adam3 tu adam1"
+    }
+  ],
+  "4": [
+    {
+      "id_msg": 1,
+      "from": 3,
+      "content": "hello adam4 tu adam3"
     }
   ]
 }

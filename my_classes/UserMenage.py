@@ -31,6 +31,16 @@ class UserMenager():
 
             print("get_user_id no Value") 
             return None
+         
+    def get_id_by_user(self,username):
+        with open(self.userfile, mode="r", encoding="utf-8") as u:
+            users = json.load(u)
+            for user in users:
+                if user["username"]==username:
+                    return str(user["id"])
+
+            print("get_id_by_user no Value") 
+            return None
     
 
     def create_user(self,name, password):
@@ -107,7 +117,7 @@ class UserMenager():
                             self.pending_admin= None
                             self.pending_user = None 
                             self.logged_admin = True                       
-                            return "You are already login as an admin"
+                            return "You are already logged in as an admin"
                     else: 
                         self.pending_admin= None  # login in progress
                         return "Incorrect password"
@@ -124,7 +134,7 @@ class UserMenager():
                         self.logged_user_id=self.pending_user_id # fully authenticated user
                         self.pending_user = None  # login in progress
                         self.pending_user_id = None  # login in progress
-                        return f"You are login as {self.logged_user}"
+                        return f"You are logged in as {self.logged_user}"
 
             self.pending_user = None  # login in progress
             return "Incorrect password"
@@ -137,7 +147,7 @@ class UserMenager():
 
     def status(self):
         if self.logged_user:
-            return f"You are already login as {self.logged_user}"
+            return f"You are already logged in as {self.logged_user}"
         else:
-            return "You are not loggin, please type your login and password"
+            return "You are not logged in, please type your login and password"
             
