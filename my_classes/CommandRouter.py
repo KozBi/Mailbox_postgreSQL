@@ -26,6 +26,8 @@ class CommandRouter:
         "'msg' check how many messages you have\n" 
         "'w' 'receiver' write a message to another user\n" 
         "'rd' read all message\n" 
+        "'del' 'message_numer' or '-a' - delete specified message or all messages\n" 
+
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         }
 
