@@ -22,7 +22,7 @@ class Client:
             while True:
                 command=input(">>>").strip()
                 s.sendall(command.encode('utf-8'))
-                data = s.recv(1024)
+                data = s.recv(2024)
                 response = json.loads(data.decode('utf-8'))
                 if command != "stop":
                     print(self.handle_response(response))

@@ -1,6 +1,6 @@
 import json
 import hashlib
-from my_classes.MessagingService import MessagingService
+#from my_classes.MessagingService import MessagingService
 
 class UserMenager():
     def __init__(self):
@@ -14,47 +14,45 @@ class UserMenager():
         self.logged_user_id= None # already login user
         self.logged_admin= None # already login user
 
-    userfile="Jsondata/Users.json"
-    adminfile="Jsondata/Admin.json"
-    passfile="Jsondata/Passwords.json"
+        self.userfile="Jsondata/Users.json"
+        self.passfile="Jsondata/Passwords.json"
 
     @staticmethod
     def _hash_password(password):
         return hashlib.sha256(password.encode()).hexdigest()
     
+    def _load_user(self):
+        with open(self.userfile, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    
     def get_user_by_id(self,id):
-         with open(self.userfile, mode="r", encoding="utf-8") as u:
-            users = json.load(u)
-            for user in users:
-                if user["id"]==id:
-                    return user["username"]
-
-            print("get_user_id no Value") 
-            return None
+        users = self._load_user()
+        for user in users:
+            if user["id"]==id:
+                return user["username"]
+        print(f"get_user_by_id:{id} no Value") 
+        return None
          
     def get_id_by_user(self,username):
-        with open(self.userfile, mode="r", encoding="utf-8") as u:
-            users = json.load(u)
-            for user in users:
-                if user["username"]==username:
-                    return str(user["id"])
-
-            print("get_id_by_user no Value") 
-            return None
+        users = self._load_user()
+        for user in users:
+            if user["username"]==username:
+                return str(user["id"])
+        print(f"get_id_by_user:{username} no Value") 
+        return None
     
 
     def create_user(self,name, password):
-        with open(self.userfile, mode="r", encoding="utf-8") as u:
-            users = json.load(u)
-            if name in [user["username"] for user in users]:
-                return "User already exists, try another name"            
-            else: 
-                #find max id and +1. Generator used here!
-                new_id = max((user["id"] for user in users), default=0) + 1
-            # save password as pennding 
-            self.pending_cr_password=password
-            self.pending_cr_user = name
-            self.pending_cr_user_id = new_id
+        users = self._load_user()
+        if name in [user["username"] for user in users]:
+            return "User already exists, try another name"            
+        else: 
+            #find max id and +1. Generator used here!
+            new_id = max((user["id"] for user in users), default=0) + 1
+        # save password as pennding 
+        self.pending_cr_password=password
+        self.pending_cr_user = name
+        self.pending_cr_user_id = new_id
         return "Please insert password once again to confirm your password"
         
     def create_user_passw(self,password):
@@ -86,55 +84,41 @@ class UserMenager():
         else:
             return "Password inncorret"
 
-    def check_login(self,username):
-        #login as admin
-        if username=='admin':
-                self.pending_admin=True
-                self.pending_user="admin"
-                return "You are trying login as an admin, please insert password"         
-        #login as a normal user
-        try:
-            with open(self.userfile, mode="r", encoding="utf-8") as read_file:
-                users_namesjson = json.load(read_file)
-                
-            for user in users_namesjson:
-                if user["username"]==username:
+    def check_login(self,username):       
+        #login as user
+        users_namesjson = self._load_user()
+            
+        for user in users_namesjson:
+            if user["username"]==username: #dictionary.get(keyname, value), Optional. A value to return if the specified key does not exist.
+                # check if user is admin
+                if user.get("is_admin", False):
+                    self.pending_admin=True
                     self.pending_user=username
                     self.pending_user_id=user["id"]
-                    return "Login found, please insert password"       
-            return "User doesn't exist"            
-        except:
-            return "User data corrupted or not found"
+                    return "You are trying login as an admin, please insert password"  
+                self.pending_user=username
+                self.pending_user_id=user["id"]
+                return "Login found, please insert password"       
+        return "User doesn't exist"            
                     
     def check_password(self,pasw):
-        if self.pending_admin:
-            #admin password
-            try:
-                with open(self.adminfile, mode="r", encoding="utf-8") as read_file:
-                    users_pass = json.load(read_file)
-                    if users_pass[self.pending_user] == pasw:
-                            self.logged_user= "admin" # fully authenticated admin
-                            self.pending_admin= None
-                            self.pending_user = None 
-                            self.logged_admin = True                       
-                            return "You are already logged in as an admin"
-                    else: 
-                        self.pending_admin= None  # login in progress
-                        return "Incorrect password"
-            except:
-                return "User data corrupted or not found"
-            #user password
-
+        _txt=""
         with open(self.passfile, mode="r", encoding="utf-8") as read_file:
             users_pass = json.load(read_file)
             for pw in users_pass:
                 if pw["user_id"]==self.pending_user_id:
                     if pw["pass"]==self._hash_password(pasw):
+                        #login as admin
+                        if self.pending_admin:
+                            self.pending_admin= None
+                            self.logged_admin = True  
+                            _txt=" You are loged in as admin"
+
                         self.logged_user=self.pending_user # fully authenticated user
                         self.logged_user_id=self.pending_user_id # fully authenticated user
                         self.pending_user = None  # login in progress
                         self.pending_user_id = None  # login in progress
-                        return f"You are logged in as {self.logged_user}"
+                        return f"You are logged in as {self.logged_user}{_txt}"
 
             self.pending_user = None  # login in progress
             return "Incorrect password"
@@ -142,6 +126,7 @@ class UserMenager():
     def logout(self):
         self.logged_user= None
         self.logged_user_id= None
+        self.logged_admin = None
         return "User succesfully logout"
                   
 
@@ -150,4 +135,16 @@ class UserMenager():
             return f"You are already logged in as {self.logged_user}"
         else:
             return "You are not logged in, please type your login and password"
+        
+    #admin acces 
+    #     
+    def admin_list_users(self):
+        users="List of all users:\n"
+        data=self._load_user()
+        for user in data:
+            user=user["username"]
+            users+=f"{user}\n"
+        return users
+
+
             

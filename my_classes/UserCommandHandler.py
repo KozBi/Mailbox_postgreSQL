@@ -31,6 +31,11 @@ class UserCommandHandler:
             self.UserMenager.logout()
             return "You have been succesfully logout"
         
+        if self.UserMenager.logged_admin:
+
+            if parts[0]=="admin_user":
+                return self.UserMenager.admin_list_users()
+        
         # command not related to this class
         return None     
 

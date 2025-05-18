@@ -5,7 +5,7 @@ from my_classes.CommandRouter import CommandRouter
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-VERSION = "1.0.1"
+VERSION = "2.0.0"
 CREATION_DATE = datetime.now()
 
 class Server:
@@ -22,7 +22,7 @@ class Server:
             with conn:
                 print(f"Connected by {addr} and {conn}")
                 while True:
-                    data = conn.recv(1024)
+                    data = conn.recv(2024)
                     if not data:
                         break
                     command = data.decode('utf-8') # receive from client a task

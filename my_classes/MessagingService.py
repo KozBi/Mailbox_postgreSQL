@@ -35,21 +35,23 @@ class MessagingService():
             _num=self._count_message_num(file_u)   
             if _num<self.max_messages:
                 return f"You have {_num} messages" 
-            else: return f"You have {_num} messages. Your's box messages is full. Please delete messages using del command"
+            else: return f"You have {_num} messages. Your box messages is full. Please delete messages using del command"
         except KeyError: return "You don't have messages"
 
     def read_message_all(self,user_id,Umenager):
         messages=self._load_messages()
         msgs=""
-        u_message=messages[str(user_id)]
-        for t_dict in (u_message):    
-            #String concatenation 
-            msgs+= f"Message number:{t_dict ['id_msg']} from {Umenager.get_user_by_id((t_dict ['from']))}: {t_dict ['content']}\n"    
-        if msgs!="":
-            if self._count_message_num(u_message)>=self.max_messages:
-                return f"{msgs} +  Your's box messages is full. Please delete messages using del command"
-            else: return msgs   
-        else: return "You dont have any messages"
+        try:
+            u_message=messages[str(user_id)]
+            for t_dict in (u_message):    
+                #String concatenation 
+                msgs+= f"Message number:{t_dict ['id_msg']} from {Umenager.get_user_by_id((t_dict ['from']))}: {t_dict ['content']}\n"    
+            if msgs!="":
+                if self._count_message_num(u_message)>=self.max_messages:
+                    return f"{msgs} +  Your's box messages is full. Please delete messages using del command"
+                else: return msgs   
+            else: return "You dont have any messages"
+        except(KeyError): return f"This user doesn't exist:{user_id}"
         
     def receiver_found(self,user_id,receiver,Umenager):
         _receiver=Umenager.get_id_by_user(receiver)
@@ -60,7 +62,7 @@ class MessagingService():
             self._write_m_tpl=None
             return f"{receiver} not found in userlist"
  
-    def write_message(self,sender,receiver,message,Umenager):
+    def write_message(self,sender,receiver,message):
         if len(message) > 255:
             self._write_m_tpl=None
             return "Message too long (max 255 characters)."
@@ -68,7 +70,7 @@ class MessagingService():
         messages_file= self._load_messages()
         if self._count_message_num(messages_file[receiver])>=5:
             self._write_m_tpl=None
-            return "User you want to send a messag has full messagebox. You cannot send a message"
+            return "The recipient's message box is full. You cannot send a message"
         #check if key exist
         if receiver not in messages_file:
             messages_file[receiver] = []
@@ -81,7 +83,7 @@ class MessagingService():
         self._write_m_tpl=None
         return "Message sent"
 
-    def delete_message(self,username,id,Umenager):
+    def delete_message(self,username,id):
         data = self._load_messages()
         new_data=[]
         username=str(username) 
@@ -93,18 +95,15 @@ class MessagingService():
                     if str(msg['id_msg']) != id:
                         new_data.append(msg)
             data[username]=new_data
- #           try:
             self._save_messages(data)
             if id=="-a":
                 return f"All messages has been deleted"
             return f"Message {id} has been deleted"
-    #        except: return f"Message {id} cannot be been deleted. Please conntact KozBi"
-    #    else: print("user not find for delete_message")
 
-    def handle_message_command(self,command,user_id,UserMenage):
+    def handle_message_command(self,command,user_id,admin,UserMenage):
 
         if self._write_m_tpl:
-            return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command,UserMenage)
+            return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command)
 
         parts=command.split() #split string
         
@@ -119,9 +118,17 @@ class MessagingService():
         elif parts[0]=="w": return "Please specify a user to write to"
         
         if parts[0]=="del" and len(parts)>1:
-            return self.delete_message(user_id,parts[1],UserMenage)
+            return self.delete_message(user_id,parts[1])
         elif parts[0]=="del":
             return "Wrong parameter with command 'del', please enter message number also"
+        
+        #admin accees:
+        if admin:
+            
+            if parts[0]=="admin_rd" and len(parts)>1:
+                return self.read_message_all(UserMenage.get_id_by_user(parts[1]),UserMenage)
+            elif parts[0]=="admin_rd":
+                return "Please eneter username -- admin_rd 'username'"
         
         else:
             return None
