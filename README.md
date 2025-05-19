@@ -1,16 +1,27 @@
-# 🔌 Simple Python Client-Server Application
+🔌 Simple Python Client-Server Application
+A basic Python socket-based client-server app with user accounts and messaging functionality.
 
-This is a minimal client-server application written in Python using sockets. It allows the client to send predefined commands to the server and receive appropriate responses.
+🧠 Features
 
-## 🧠 Features
+TCP communication over localhost (127.0.0.1)
 
-- TCP communication over localhost (`127.0.0.1`)
-- Simple command handling:
-  - `help` – shows available commands
-  - `uptime` – shows how long the server has been running
-  - `info` – returns the server version
-  - `stop` – stops the server
+User registration and login
 
-## 📦 Requirements
+Sending private messages between connected users
 
-- Python 3.x
+Admin acces to all users
+
+
+Basic command support:
+
+help – list available commands
+
+uptime – show how long the server has been running
+
+info – show server version
+
+stop – stop the server
+
+📦 Requirements
+
+Python 3.x
