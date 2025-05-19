@@ -26,7 +26,15 @@ class UserCommandHandler:
             # check password
             if self.UserMenager.pending_user:     
                     return self.UserMenager.check_password(cmd) 
-        
+            
+        #password change
+        if parts[0]=="pw_change" and len(parts)>1:
+           return  self.UserMenager.change_password(parts[1])   
+        elif self.UserMenager._pending_password_change:
+            return  self.UserMenager.change_password(parts[0])  
+        elif parts[0]=="pw_change":
+            return "Pease enter a new password as a second argument"
+
         if parts[0]=="logout":
             self.UserMenager.logout()
             return "You have been succesfully logout"

@@ -68,12 +68,12 @@ class MessagingService():
             return "Message too long (max 255 characters)."
 
         messages_file= self._load_messages()
-        if self._count_message_num(messages_file[receiver])>=5:
-            self._write_m_tpl=None
-            return "The recipient's message box is full. You cannot send a message"
         #check if key exist
         if receiver not in messages_file:
             messages_file[receiver] = []
+        if self._count_message_num(messages_file[receiver])>=5:
+            self._write_m_tpl=None
+            return "The recipient's message box is full. You cannot send a message"
         new_message={"id_msg":self._search_next_id(receiver),
                     "from":sender,
                     "content":message}              
@@ -120,7 +120,7 @@ class MessagingService():
         if parts[0]=="del" and len(parts)>1:
             return self.delete_message(user_id,parts[1])
         elif parts[0]=="del":
-            return "Wrong parameter with command 'del', please enter message number also"
+            return "Wrong parameter with command 'del', please enter message number also ['-a' delete all message]"
         
         #admin accees:
         if admin:
@@ -129,6 +129,11 @@ class MessagingService():
                 return self.read_message_all(UserMenage.get_id_by_user(parts[1]),UserMenage)
             elif parts[0]=="admin_rd":
                 return "Please eneter username -- admin_rd 'username'"
+            
+            if parts[0]=="admin_del" and len(parts)>2:
+                return self.delete_message(UserMenage.get_id_by_user(parts[1]),user_id,parts[2])
+            elif parts[0]=="admin_del":
+                return "admin_del-- admin_del 'username' 'message_number_to_delete - ['-a' delete all message]"
         
         else:
             return None

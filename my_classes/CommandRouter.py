@@ -20,13 +20,14 @@ class CommandRouter:
         "'stop'-close the server\n"
         "'login |your_login| login to your account.\n"
         "'logout' you logout from your account\n"
-        "'create |login password| - a new account create with a passowrd\n"
+        "'create 'login' 'password' - a new account create with a passowrd\n"
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         " |Commands  If you are LOGGED IN in ohter case command is unknow|\n"
         "'msg' check how many messages you have\n" 
         "'w' 'receiver' write a message to another user\n" 
         "'rd' read all message\n" 
         "'del' 'message_numer' or '-a' - delete specified message or all messages\n" 
+        "'pw_change' 'new_password change password for your account\n"
         "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
         " |Commands  If you are LOGGED IN as admin in ohter case command is unknow|\n"
         "'admin_user' get a list of all users\n" 
@@ -39,12 +40,10 @@ class CommandRouter:
         # hanlde commands from class User
         # if login add also information how many messages already loged user has.
         user_respond= self.UserCommandHandler.handle_user_command(cmd)
-        if user_respond and self.UserCommandHandler.UserMenager.logged_user_id and not self.UserCommandHandler.UserMenager.logged_admin:
-            return f"{user_respond},{self.MessagingService.number_message(self.UserCommandHandler.UserMenager.logged_user_id)}"
         if user_respond:
             return user_respond
         
-        # hanlde commands from class Messages only if user is loged
+        # hanlde commands from class MessagingService only if user is loged
         if self.UserCommandHandler.UserMenager.logged_user_id:
             # call handle message (command,loged user , send a class to get posibility to get_user_id)
             message_respond=self.MessagingService.handle_message_command(cmd, self.UserCommandHandler.UserMenager.logged_user_id,self.UserCommandHandler.UserMenager.logged_admin,self.UserCommandHandler.UserMenager)
