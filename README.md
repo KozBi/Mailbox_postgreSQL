@@ -1,27 +1,23 @@
-🔌 Simple Python Client-Server Application
-A basic Python socket-based client-server app with user accounts and messaging functionality.
+🔌 Python Client-Server Application with User Management and Messaging
+This project is a socket-based client-server application written in Python, designed for local TCP communication. Beyond basic command processing, it introduces user authentication and a simple private messaging system, simulating a minimalistic chat environment.
 
-🧠 Features
+🧠 Key Features
 
-TCP communication over localhost (127.0.0.1)
+TCP socket communication over localhost (127.0.0.1)
 
-User registration and login
+User system with registration, login, and session handling. All data are stored in Json files.
 
-Sending private messages between connected users
+Private messaging between connected users
 
-Admin acces to all users
+Command interface with built-in server commands:
 
-
-Basic command support:
-
-help – list available commands
+help – display available commands
 
 uptime – show how long the server has been running
 
-info – show server version
+info – return server version
 
-stop – stop the server
+stop – safely shut down the server
 
-📦 Requirements
-
-Python 3.x
+⚙️ How it works
+Clients connect to the server and authenticate using a simple text-based protocol. After logging in, users can interact via commands or send messages to other online users.
