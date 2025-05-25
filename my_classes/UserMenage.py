@@ -109,7 +109,6 @@ class UserMenager():
         return "User doesn't exist"            
                     
     def check_password(self,pasw):
-        _txt=""
         json_pasw = self._load_password_json()
         user_key=str(self.pending_user_id)
         if json_pasw.get(user_key, None):  
@@ -118,13 +117,12 @@ class UserMenager():
                     if self.pending_admin:
                         self.pending_admin= None
                         self.logged_admin = True  
-                        _txt=" You are loged in as admin"
 
                     self.logged_user=self.pending_user # fully authenticated user
                     self.logged_user_id=self.pending_user_id # fully authenticated user
                     self.pending_user = None  # login in progress
                     self.pending_user_id = None  # login in progress
-                    return f"You are logged in as {self.logged_user}{_txt}"
+                    return f"You are logged in as {self.logged_user}"
 
         self.pending_user = None  # login in progress
         return "Incorrect password"
@@ -141,7 +139,6 @@ class UserMenager():
         elif self._pending_password_change and self._pending_password_change==pasw:
             data=self._load_password_json()
             user_key=str(self.logged_user_id)
-            print(f"Key error{user_key}")
             if data.get(user_key, None):                
                 data[user_key]=self._hash_password(pasw)
                 self._save_password_json(data)
