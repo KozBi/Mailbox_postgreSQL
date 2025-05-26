@@ -46,10 +46,7 @@ class CommandRouter:
         # hanlde commands from class MessagingService only if user is loged
         if self.UserCommandHandler.UserMenager.logged_user_id:
             # call handle message (command,loged user , send a class to get posibility to get_user_id)
-            message_respond=self.MessagingService.handle_message_command(cmd, 
-                                                                         self.UserCommandHandler.UserMenager.logged_user_id,
-                                                                         self.UserCommandHandler.UserMenager.logged_admin,
-                                                                         self.UserCommandHandler.UserMenager)
+            message_respond=self.MessagingService.handle_message_command(cmd,self.UserCommandHandler.UserMenager)
             if message_respond:
                 return message_respond
         

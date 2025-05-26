@@ -38,9 +38,11 @@ class MessagingService():
             else: return f"You have {_num} messages. Your box messages is full. Please delete messages using del command"
         except KeyError: return "You don't have messages"
 
-    def read_message_all(self,user_id,Umenager):
+    def read_message_all(self,Umenager,user_id=None):
         messages=self._load_messages()
         msgs=""
+        if not user_id:
+            user_id=Umenager.logged_user_id
         try:
             u_message=messages[str(user_id)]
             for t_dict in (u_message):    
@@ -53,8 +55,9 @@ class MessagingService():
             else: return "You dont have any messages"
         except(KeyError): return f"This user doesn't exist:{user_id}"
         
-    def receiver_found(self,user_id,receiver,Umenager):
+    def receiver_found(self,receiver,Umenager):
         _receiver=Umenager.get_id_by_user(receiver)
+        user_id=Umenager.logged_user_id
         if _receiver:
             self._write_m_tpl=(user_id,_receiver)
             return f"User: {receiver} found, please type a message --- max 255 of characters"
@@ -83,10 +86,11 @@ class MessagingService():
         self._write_m_tpl=None
         return "Message sent"
 
-    def delete_message(self,username,id):
+    def delete_message(self,id,Umenager,username=None):
         data = self._load_messages()
         new_data=[]
-        username=str(username) 
+        if not username:
+            username=str(Umenager.logged_user_id)
         if username in data:
             if id=="-a":
                 new_data=[]
@@ -100,38 +104,45 @@ class MessagingService():
                 return f"All messages has been deleted"
             return f"Message {id} has been deleted"
 
-    def handle_message_command(self,command,user_id,admin,UserMenage):
+    def handle_message_command(self,command,UserMenage):
 
         if self._write_m_tpl:
             return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command)
 
         parts=command.split() #split string
         
-        if parts[0]=="msg" and user_id:
-            return f"Nummber of messages for {UserMenage.get_user_by_id(user_id)} : {self.number_message(user_id)}"
+        if parts[0]=="msg" and UserMenage.logged_user_id:
+            return f"Nummber of messages for {UserMenage.logged_user} : {self.number_message(UserMenage.logged_user_id)}"
         
         if parts[0]=="rd":
-            return self.read_message_all(user_id,UserMenage)
+            return self.read_message_all(UserMenage)
         
         if parts[0]=="w" and len(parts)>1:
-                return self.receiver_found(user_id,parts[1],UserMenage)
+                return self.receiver_found(parts[1],UserMenage)
         elif parts[0]=="w": return "Please specify a user to write to"
         
         if parts[0]=="del" and len(parts)>1:
-            return self.delete_message(user_id,parts[1])
+            return self.delete_message(parts[1],UserMenage)
         elif parts[0]=="del":
             return "Wrong parameter with command 'del', please enter message number also ['-a' delete all message]"
         
         #admin accees:
-        if admin:
+        if UserMenage.logged_admin:
             
             if parts[0]=="admin_rd" and len(parts)>1:
-                return self.read_message_all(UserMenage.get_id_by_user(parts[1]),UserMenage)
+                who=UserMenage.get_id_by_user(parts[1])
+                if who:
+                    return self.read_message_all(UserMenage,who)
+                else:
+                    return "Please eneter correct username -- admin_rd 'username'"
             elif parts[0]=="admin_rd":
                 return "Please eneter username -- admin_rd 'username'"
             
             if parts[0]=="admin_del" and len(parts)>2:
-                return self.delete_message(UserMenage.get_id_by_user(parts[1]),user_id,parts[2])
+                who=UserMenage.get_id_by_user(parts[1])
+                if who:
+                    return self.delete_message(parts[2],UserMenage,who)
+                else: return "This user doesn't exist"
             elif parts[0]=="admin_del":
                 return "admin_del-- admin_del 'username' 'message_number_to_delete - ['-a' delete all message]"
         

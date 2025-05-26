@@ -153,6 +153,14 @@ class TestUserMenage(unittest.TestCase):
         result3=self.UCH.handle_user_command("new_passoword")
         self.assertIn("Password has been changed" ,result3)
 
+        #logout for test new password
+        self.UCH.handle_user_command("logout")
+
+        #login with a new password
+        self.UCH.handle_user_command("login adam3")
+        result = self.UCH.handle_user_command("new_passoword")
+        self.assertIn("You are logged in as adam3", result)
+
     def test_status(self):
 
         result=self.UCH.UserMenager.status()
