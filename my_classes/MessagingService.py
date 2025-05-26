@@ -1,7 +1,9 @@
 import json
+from my_classes.UserMenager import UserMenager as UM
+
 
 class MessagingService():
-    def __init__(self,f_message):
+    def __init__(self,f_message:str):
         self.f_message=f_message #f_message message
         self._write_m_tpl=None #wrtie message tuple - help variable for write message
 
@@ -38,7 +40,7 @@ class MessagingService():
             else: return f"You have {_num} messages. Your box messages is full. Please delete messages using del command"
         except KeyError: return "You don't have messages"
 
-    def read_message_all(self,Umenager,user_id=None):
+    def read_message_all(self,Umenager:UM,user_id=None):
         messages=self._load_messages()
         msgs=""
         if not user_id:
@@ -55,7 +57,7 @@ class MessagingService():
             else: return "You dont have any messages"
         except(KeyError): return f"This user doesn't exist:{user_id}"
         
-    def receiver_found(self,receiver,Umenager):
+    def receiver_found(self,receiver,Umenager:UM):
         _receiver=Umenager.get_id_by_user(receiver)
         user_id=Umenager.logged_user_id
         if _receiver:
@@ -86,7 +88,7 @@ class MessagingService():
         self._write_m_tpl=None
         return "Message sent"
 
-    def delete_message(self,id,Umenager,username=None):
+    def delete_message(self,id,Umenager:UM,username=None):
         data = self._load_messages()
         new_data=[]
         if not username:
@@ -104,7 +106,7 @@ class MessagingService():
                 return f"All messages has been deleted"
             return f"Message {id} has been deleted"
 
-    def handle_message_command(self,command,UserMenage):
+    def handle_message_command(self,command,UserMenage:UM):
 
         if self._write_m_tpl:
             return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command)

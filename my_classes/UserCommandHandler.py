@@ -1,9 +1,9 @@
-from my_classes.UserMenage import  UserMenager
+from my_classes.UserMenager import  UserMenager
 class UserCommandHandler:
     def __init__(self):
         self.UserMenager=UserMenager()
 
-    def handle_user_command(self, cmd):
+    def handle_user_command(self, cmd:str):
       
         parts=cmd.split() #split string
 

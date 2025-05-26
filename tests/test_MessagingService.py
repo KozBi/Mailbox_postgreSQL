@@ -4,7 +4,7 @@ import json
 import os
 
 from my_classes.MessagingService import MessagingService
-from my_classes.UserMenage import UserMenager
+from my_classes.UserMenager import UserMenager
 
 class Test(unittest.TestCase):
 
@@ -12,6 +12,7 @@ class Test(unittest.TestCase):
         #create object but json file is a test file
         self.service=MessagingService("tests/fixtures/test_Messages.json")
         self.user=UserMenager()
+        # file is only read, not temporary file requiered
         self.user.userfile="tests/fixtures/test_Users.json"
 
         #create temporary file with a messages
@@ -24,13 +25,10 @@ class Test(unittest.TestCase):
         self.service.f_message=self.temp_file_msg.name
 
     def tearDown(self):      
-
         # Delte file after test function
         os.remove(self.temp_file_msg.name)
 
-
-    def test_number_of_messages(self):
-        
+    def test_number_of_messages(self):   
         #max messages
         result=self.service.number_message(1)
         self.assertIn(result,"You have 5 messages. Your box messages is full. Please delete messages using del command")
