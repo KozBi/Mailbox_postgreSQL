@@ -21,3 +21,19 @@ stop – safely shut down the server
 
 ⚙️ How it works
 Clients connect to the server and authenticate using a simple text-based protocol. After logging in, users can interact via commands or send messages to other online users.
+
+📦 Testing
+
+This project includes a suite of automated tests written using Python’s built-in unittest framework. The tests cover:
+
+Core user operations (registration, login, logout)
+
+Authentication and session handling
+
+Password change functionality
+
+Message sending, reading, and validation
+
+Integration scenarios (full user interactions from creation to messaging)
+
+Temporary JSON files are used to isolate test environments from production data, ensuring safe and repeatable test runs.

@@ -12,6 +12,11 @@
       "id_msg": 1,
       "from": 3,
       "content": "hello adam4 tu adam3"
+    },
+    {
+      "id_msg": 2,
+      "from": 3,
+      "content": "hello adam4"
     }
   ],
   "9": [
