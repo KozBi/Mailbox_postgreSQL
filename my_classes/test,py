@@ -1,0 +1,5 @@
+from DataBaseService import DataBaseService
+
+db=DataBaseService()
+
+print(db.test())
