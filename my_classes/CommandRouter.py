@@ -11,28 +11,28 @@ class CommandRouter:
 
     
     def _help(self):
-        return {"help":"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
-        f"{self.UserCommandHandler.status()}\n"
-        "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
-        "Available command:\n"
-        "'uptime'-return life time of server\n"
-        "'info'-informs about server version\n"
-        "'stop'-close the server\n"
-        "'login |your_login| login to your account.\n"
-        "'logout' you logout from your account\n"
-        "'create 'login' 'password' - a new account create with a passowrd\n"
-        "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
-        " |Commands  If you are LOGGED IN in ohter case command is unknow|\n"
-        "'msg' check how many messages you have\n" 
-        "'w' 'receiver' write a message to another user\n" 
-        "'rd' read all message\n" 
-        "'del' 'message_numer' or '-a' - delete specified message or all messages\n" 
-        "'pw_change' 'new_password' change password for your account\n"
-        "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
-        " |Commands  If you are LOGGED IN as admin in ohter case command is unknow|\n"
-        "'admin_user' get a list of all users\n" 
-        "'admin_rd' 'username'  read all message for a user\n" 
-        "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n" 
+        return {"help":f"""- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n 
+        {self.UserCommandHandler.status()}\n
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n 
+        Available command:\n
+        'uptime'-return life time of server\n
+        'info'-informs about server version\n
+        'stop'-close the server\n
+        'login |your_login| login to your account.\n
+        'logout' you logout from your account\n
+        'create 'login' 'password' - a new account create with a passowrd\n
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n 
+         |Commands  If you are LOGGED IN in ohter case command is unknow|\n
+        'msg' check how many messages you have\n 
+        'w' 'receiver' write a message to another user\n 
+        'rd' read all message\n 
+        'del' 'message_numer' or '-a' - delete specified message or all messages\n 
+        'pw_change' 'new_password' change password for your account\n
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n 
+         |Commands  If you are LOGGED IN as admin in ohter case command is unknow|\n
+        'admin_user' get a list of all users\n 
+        'admin_rd' 'username'  read all message for a user\n 
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n""" 
         }
 
     def handle_command(self,cmd):
