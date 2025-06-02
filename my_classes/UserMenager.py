@@ -1,5 +1,6 @@
 import json
 import hashlib
+from my_classes.DataBaseService import DataBaseService
 #from my_classes.MessagingService import MessagingService
 
 class UserMenager():
@@ -17,72 +18,47 @@ class UserMenager():
 
         self.userfile="Jsondata/Users.json"
         self.passfile="Jsondata/Passwords.json"
+        self.db = DataBaseService() 
 
     @staticmethod
     def _hash_password(password):
         return hashlib.sha256(password.encode()).hexdigest()
     
-    def _load_user_json(self):
-        with open(self.userfile, 'r', encoding='utf-8') as f:
-            return json.load(f)
+    # def _load_user_json(self):
+    #     with open(self.userfile, 'r', encoding='utf-8') as f:
+    #         return json.load(f)
         
-    def _save_user_json(self, data):
-        with open(self.userfile, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+    # def _save_user_json(self, data):
+    #     with open(self.userfile, 'w', encoding='utf-8') as f:
+    #         json.dump(data, f, indent=2, ensure_ascii=False)
     
         
-    def _load_password_json(self):
-        with open(self.passfile, 'r', encoding='utf-8') as f:
-            return json.load(f)
+    # def _load_password_json(self):
+    #     with open(self.passfile, 'r', encoding='utf-8') as f:
+    #         return json.load(f)
 
-    def _save_password_json(self, data):
-        with open(self.passfile, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+    # def _save_password_json(self, data):
+    #     with open(self.passfile, 'w', encoding='utf-8') as f:
+    #         json.dump(data, f, indent=2, ensure_ascii=False)
     
     def get_user_by_id(self,id):
-        users = self._load_user_json()
-        for user in users:
-            if user["id"]==id:
-                return user["username"]
-        print(f"get_user_by_id:{id} no Value") 
-        return None
+        return self.db.get_user_by_id(id)
          
     def get_id_by_user(self,username):
-        users = self._load_user_json()
-        for user in users:
-            if user["username"]==username:
-                return str(user["id"])
-        print(f"get_id_by_user:{username} no Value") 
-        return None
+        return self.db.get_id_by_user(username)
     
-
-    def create_user(self,name, password):
-        users = self._load_user_json()
-        if name in [user["username"] for user in users]:
-            return "User already exists, try another name"            
-        else: 
-            #find max id and +1. Generator used here!
-            new_id = max((user["id"] for user in users), default=0) + 1
-        # save password as pennding 
-        self.pending_cr_password=password
-        self.pending_cr_user = name
-        self.pending_cr_user_id = new_id
-        return "Please insert password once again to confirm your password"
+    def create_user(self,name, password):     
+        if self.db.create_user_check(name):
+            self.pending_cr_password=password
+            self.pending_cr_user = name
+     #       self.pending_cr_user_id = new_id
+            return "Please insert password once again to confirm your password"
+        else: return "User already exist"
         
     def create_user_passw(self,password):
         if password==self.pending_cr_password:
-            # first create a user
-            users = self._load_user_json()
-                #find max id and +1. Generator used here!
-            new_dic={"id": self.pending_cr_user_id , "username":self.pending_cr_user}
-            users.append(new_dic)
-            self._save_user_json(users)
-
-            # create a pasword
-            json_pass = self._load_password_json()
-            json_pass[str(self.pending_cr_user_id)]=self._hash_password(password)
-            self._save_password_json(json_pass)
-
+            # create user id postreSQL
+            self.db.create_user(self.pending_cr_user,password)
             _username=self.pending_cr_user
             self.pending_cr_user = None
             self.pending_cr_user_id = None
@@ -93,36 +69,36 @@ class UserMenager():
 
     def check_login(self,username):       
         #login as user
-        users_namesjson = self._load_user_json()
-            
-        for user in users_namesjson:
-            if user["username"]==username: #dictionary.get(keyname, value), Optional. A value to return if the specified key does not exist.
-                # check if user is admin
-                if user.get("is_admin", False):
-                    self.pending_admin=True
-                    self.pending_user=username
-                    self.pending_user_id=user["id"]
-                    return "You are trying login as an admin, please insert password"  
+   ###     users_namesjson = self._load_user_json()
+        result=self.db.check_user(username)
+        if result:
+            # check if user is admin
+            if result[1]:
+                self.pending_admin=True
                 self.pending_user=username
-                self.pending_user_id=user["id"]
-                return "Login found, please insert password"       
-        return "User doesn't exist"            
+     ###           self.pending_user_id=user["id"]
+                return "You are trying login as an admin, please insert password"  
+            self.pending_user=username
+       ####     self.pending_user_id=user["id"]
+            return "Login found, please insert password"    
+        else: return "User doesn't exist"            
                     
     def check_password(self,pasw):
-        json_pasw = self._load_password_json()
-        user_key=str(self.pending_user_id)
-        if json_pasw.get(user_key, None):  
-                if json_pasw[user_key]==self._hash_password(pasw):
-                #login as admin
-                    if self.pending_admin:
-                        self.pending_admin= None
-                        self.logged_admin = True  
+ ###       json_pasw = self._load_password_json()
+ ###       user_key=str(self.pending_user_id)
+   ###     if json_pasw.get(user_key, None):  
+        result=self.db.check_user(self.pending_user)
+        if result[2]==self._hash_password(pasw):
+        #login as admin
+            if self.pending_admin:
+                self.pending_admin= None
+                self.logged_admin = True  
 
-                    self.logged_user=self.pending_user # fully authenticated user
-                    self.logged_user_id=self.pending_user_id # fully authenticated user
-                    self.pending_user = None  # login in progress
-                    self.pending_user_id = None  # login in progress
-                    return f"You are logged in as {self.logged_user}"
+            self.logged_user=self.pending_user # fully authenticated user
+            self.logged_user_id=self.pending_user_id # fully authenticated user
+            self.pending_user = None  # login in progress
+            self.pending_user_id = None  # login in progress
+            return f"You are logged in as {self.logged_user}"
 
         self.pending_user = None  # login in progress
         return "Incorrect password"
@@ -137,12 +113,8 @@ class UserMenager():
             return "Passwords are not the same"       
         #password are the same, save new password
         elif self._pending_password_change and self._pending_password_change==pasw:
-            data=self._load_password_json()
-            user_key=str(self.logged_user_id)
-            if data.get(user_key, None):                
-                data[user_key]=self._hash_password(pasw)
-                self._save_password_json(data)
-                self._pending_password_change=None
+
+            if self.db.password_change(self.logged_user_id,pasw):
                 return "Password has been changed"           
         #safe pending password
         else: 
@@ -166,12 +138,7 @@ class UserMenager():
     #admin acces 
     #     
     def admin_list_users(self):
-        users="List of all users:\n"
-        data=self._load_user_json()
-        for user in data:
-            user=user["username"]
-            users+=f"{user}\n"
-        return users
+        return self.db.admin_all_users()
 
 
             
