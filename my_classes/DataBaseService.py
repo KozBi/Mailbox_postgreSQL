@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2.errors import UniqueViolation
+from psycopg2.extensions import connection as Psycopg2Connection
 
 class DataBaseService():
     def __init__(self,host:str='localhost',database:str="mailbox", user:str="postgres", password:str="admin" ):
@@ -97,14 +98,17 @@ class DataBaseService():
             return (False, "Could not update password")
         
     def get_id_by_user(self,username:str):
+        """
+        Returns: int
+            """
         self.curr.execute("""SELECT id from users where username=%s;""",(username,))
         result=self.curr.fetchone()
-        return result
+        return result[0]
     
     def get_user_by_id(self,id:int):
         self.curr.execute("""SELECT username from users where id=%s;""",(id,))
         result=self.curr.fetchone()
-        return result
+        return result[0]
 
     def admin_all_users(self):
         self.curr.execute("""

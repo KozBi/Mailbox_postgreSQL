@@ -1,7 +1,8 @@
 from my_classes.UserMenager import  UserMenager
 class UserCommandHandler:
-    def __init__(self):
-        self.UserMenager=UserMenager()
+    def __init__(self,database):
+        self.database=database
+        self.UserMenager=UserMenager(database=self.database)
 
     def handle_user_command(self, cmd:str):
       

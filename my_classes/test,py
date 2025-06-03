@@ -15,3 +15,7 @@ print(db.get_id_by_user("adam3"))
 print(db.get_id_by_user("adam3xx"))
 print(db.get_user_by_id(14))
 print(db.get_user_by_id(13))
+
+xd={}
+
+xd.get

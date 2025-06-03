@@ -2,6 +2,7 @@ import socket
 import json
 from datetime import datetime
 from my_classes.CommandRouter import CommandRouter
+from my_classes.DataBaseService import DataBaseService
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
@@ -10,7 +11,8 @@ CREATION_DATE = datetime.now()
 
 class Server:
     def __init__(self):
-        self.CommandRouter=CommandRouter(VERSION,CREATION_DATE)
+        database=DataBaseService()
+        self.CommandRouter=CommandRouter(VERSION,CREATION_DATE,database)
         self.response=None           
 
     def start_server(self):

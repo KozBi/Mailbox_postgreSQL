@@ -1,38 +1,51 @@
 import unittest
-import tempfile
+import psycopg2
+#import tempfile
 import json
-import os
+#import os
 from my_classes.UserCommandHandler import UserCommandHandler
+from my_classes.UserMenager import UserMenager
+from my_classes.DataBaseService import DataBaseService
 
-class TestUserMenage(unittest.TestCase):
+class TestUserMenagerIntegration(unittest.TestCase):
 
-    def setUp(self):
-        #create temporary file with a example users
-        with open("tests/fixtures/test_Users.json", 'r',encoding='utf-8') as f:
-            data=json.load(f)
-        self.temp_file = tempfile.NamedTemporaryFile(mode="w+", delete=False)
-        json.dump(data, self.temp_file)
-        self.temp_file.close()
+    #classmethod to run only once connection to test database.
+    @classmethod
+    def setUp(cls):
+        cls.conn=psycopg2.connect(
+                host='localhost',
+                database='test_mailbox',       
+                user='postgres',      
+                password='admin')
+        cls.curs=cls.conn.cursor()
+        cls.restet_database()
+        cls.database=DataBaseService(database="test_mailbox")
+        cls.UCH=UserCommandHandler(cls.database)
+#cls.UCH.UserMenager.db.conn=cls.conn
 
-        #create temporary file with a example passwords
-        with open("tests/fixtures/test_Passwords.json", 'r',encoding='utf-8') as f:
-            data=json.load(f)
-        self.temp_file_pw = tempfile.NamedTemporaryFile(mode="w+", delete=False)
-        json.dump(data, self.temp_file_pw)
-        self.temp_file_pw.close()
+    @classmethod
+    def tearDown(cls):
+        cls.conn.close()
 
-        #overwrite Users.json with a temporary file
-        self.UCH=UserCommandHandler()
-        self.UCH.UserMenager.userfile=self.temp_file.name
-        self.UCH.UserMenager.passfile=self.temp_file_pw.name
+    #reset test_mailbox each tim when test is called.
+    @classmethod
+    def restet_database(cls):
+        cls.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
+        passwords=["admin","bob","adam3"]
+        with open("tests/fixtures/test_Users.json", "r", encoding="utf-8" ) as f:
+            users = json.load(f)
+        for u, p in zip(users,passwords):
+            hashed = UserMenager._hash_password(p)
+            print(f" xddd {hashed}")
+            print(u["username"])
+            if u.get("is_admin"):
+                is_adm=u.get("is_admin")
+            else: is_adm=None
+            cls.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
+                            (u["username"],hashed, is_adm))    
+            print (is_adm)       
+        cls.conn.commit()
 
-
-    def tearDown(self):
-        
-        
-        # Delte file after test function
-        os.remove(self.temp_file.name)
-        os.remove(self.temp_file_pw.name)
 
     
     def test_get_user_id(self):
@@ -44,10 +57,10 @@ class TestUserMenage(unittest.TestCase):
         self.assertEqual(result2,"bob")
 
         result3=self.UCH.UserMenager.get_id_by_user("admin")
-        self.assertEqual(result3,"1")
+        self.assertEqual(result3,1)
 
         result4=self.UCH.UserMenager.get_id_by_user("bob")
-        self.assertEqual(result4,"2")
+        self.assertEqual(result4,2)
 
 
     def test_handle_user_command_create_user(self):
@@ -62,11 +75,11 @@ class TestUserMenage(unittest.TestCase):
         result2=self.UCH.handle_user_command("password123")
         self.assertIn("created successfully.",result2)
 
-        result3=self.UCH.UserMenager.get_user_by_id(4)
-        self.assertEqual(result3,"user123")
+        result3=self.UCH.UserMenager.get_user_by_id(2)
+        self.assertEqual(result3,"bob")
 
-        result4=self.UCH.UserMenager.get_id_by_user("user123")
-        self.assertEqual(result4,"4")
+        result4=self.UCH.UserMenager.get_id_by_user("bob")
+        self.assertEqual(result4,2)
 
     def test_check_login_admin_and_fct(self):
 

@@ -3,10 +3,11 @@ from my_classes.UserCommandHandler import UserCommandHandler
 from datetime import datetime
 
 class CommandRouter:
-    def __init__(self, Version,Creationdate):
+    def __init__(self, Version,Creationdate,database):
         self.Version=Version
         self.Creationdate=Creationdate
-        self.UserCommandHandler= UserCommandHandler()
+        self.database=database
+        self.UserCommandHandler= UserCommandHandler(database=self.database)
         self.MessagingService=MessagingService("Jsondata/Messages.json")
 
     

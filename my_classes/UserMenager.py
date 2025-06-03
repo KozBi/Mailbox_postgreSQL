@@ -4,7 +4,7 @@ from my_classes.DataBaseService import DataBaseService
 #from my_classes.MessagingService import MessagingService
 
 class UserMenager():
-    def __init__(self):
+    def __init__(self,database):
         self.pending_user = None # login in progress
         self.pending_user_id = None # login in progress
         self.pending_admin = None # login in progress
@@ -16,9 +16,11 @@ class UserMenager():
         self.logged_admin= None # already login user
         self._pending_password_change=None
 
+        self.database=database
+
         self.userfile="Jsondata/Users.json"
         self.passfile="Jsondata/Passwords.json"
-        self.db = DataBaseService() 
+        self.db = database
 
     @staticmethod
     def _hash_password(password):
@@ -45,6 +47,9 @@ class UserMenager():
         return self.db.get_user_by_id(id)
          
     def get_id_by_user(self,username):
+        """
+        Returns: int
+        """
         return self.db.get_id_by_user(username)
     
     def create_user(self,name, password):     
