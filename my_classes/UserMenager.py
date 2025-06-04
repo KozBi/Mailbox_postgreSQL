@@ -1,10 +1,9 @@
 import json
 import hashlib
 from my_classes.DataBaseService import DataBaseService
-#from my_classes.MessagingService import MessagingService
 
 class UserMenager():
-    def __init__(self,database):
+    def __init__(self,database:DataBaseService):
         self.pending_user = None # login in progress
         self.pending_user_id = None # login in progress
         self.pending_admin = None # login in progress
@@ -63,7 +62,7 @@ class UserMenager():
     def create_user_passw(self,password):
         if password==self.pending_cr_password:
             # create user id postreSQL
-            self.db.create_user(self.pending_cr_user,password)
+            self.db.create_user(self.pending_cr_user,self._hash_password(password))
             _username=self.pending_cr_user
             self.pending_cr_user = None
             self.pending_cr_user_id = None
@@ -81,10 +80,10 @@ class UserMenager():
             if result[1]:
                 self.pending_admin=True
                 self.pending_user=username
-     ###           self.pending_user_id=user["id"]
+                self.pending_user_id=result[0]
                 return "You are trying login as an admin, please insert password"  
             self.pending_user=username
-       ####     self.pending_user_id=user["id"]
+            self.pending_user_id=result[0]
             return "Login found, please insert password"    
         else: return "User doesn't exist"            
                     
@@ -105,6 +104,7 @@ class UserMenager():
             self.pending_user_id = None  # login in progress
             return f"You are logged in as {self.logged_user}"
 
+        self.pending_user_id = None  # login in progress
         self.pending_user = None  # login in progress
         return "Incorrect password"
         
@@ -118,8 +118,9 @@ class UserMenager():
             return "Passwords are not the same"       
         #password are the same, save new password
         elif self._pending_password_change and self._pending_password_change==pasw:
-
-            if self.db.password_change(self.logged_user_id,pasw):
+            result=self.db.password_change(self.logged_user_id,self._hash_password(pasw))
+            self._pending_password_change=None
+            if  result[0]:
                 return "Password has been changed"           
         #safe pending password
         else: 

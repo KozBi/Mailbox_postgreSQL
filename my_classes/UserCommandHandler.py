@@ -35,8 +35,10 @@ class UserCommandHandler:
             return  self.UserMenager.change_password(parts[0])  
         elif parts[0]=="pw_change":
             return "Pease enter a new password as a second argument"
-
-        if parts[0]=="logout":        
+        aa=parts[0] 
+        print(parts[0])
+        if parts[0]=="logout": 
+                  
             return self.UserMenager.logout()
         
         if self.UserMenager.logged_admin:

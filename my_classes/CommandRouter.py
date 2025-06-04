@@ -7,8 +7,8 @@ class CommandRouter:
         self.Version=Version
         self.Creationdate=Creationdate
         self.database=database
-        self.UserCommandHandler= UserCommandHandler(database=self.database)
-        self.MessagingService=MessagingService("Jsondata/Messages.json")
+        self.UserCommandHandler= UserCommandHandler(self.database)
+        self.MessagingService=MessagingService(self.database)
 
     
     def _help(self):

@@ -50,8 +50,8 @@ class DataBaseService():
     SELECT id FROM users WHERE username=(%s);""", (username,))
         result=self.curr.fetchone()
         if result:
-            return (result)
-        else: return (None)
+            return None
+        else: return True
 
     def create_user(self,username:str,password:str):
         try:
@@ -118,6 +118,13 @@ class DataBaseService():
             return (result)
         else: return (None)
 
+    def msg_count(self,id_user:int):
+        self.curr.execute("""
+    SELECT COUNT(*) FROM messages WHERE receiver_id=%s;""",(id_user,))
+        result=self.curr.fetchone()
+        if result:
+            return (result[0])
+        else: return "NIC"
 
 
 

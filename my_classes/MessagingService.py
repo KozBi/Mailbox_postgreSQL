@@ -1,44 +1,42 @@
-import json
 from my_classes.UserMenager import UserMenager as UM
+from my_classes.DataBaseService import DataBaseService
 
 
 class MessagingService():
-    def __init__(self,f_message:str):
-        self.f_message=f_message #f_message message
+    def __init__(self,database:DataBaseService):
+        self.database=database 
         self._write_m_tpl=None #wrtie message tuple - help variable for write message
 
         self.max_messages=5
 
-    def _load_messages(self):
-        with open(self.f_message, 'r', encoding='utf-8') as f:
-            return json.load(f)
+    # def _load_messages(self):
+    #     with open(self.f_message, 'r', encoding='utf-8') as f:
+    #         return json.load(f)
 
-    def _save_messages(self, data):
-        with open(self.f_message, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+    # def _save_messages(self, data):
+    #     with open(self.f_message, 'w', encoding='utf-8') as f:
+    #         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    def _search_next_id(self,username):
-        messages=self._load_messages()
-        try:
-            used_ids={list_element["id_msg"] for list_element in messages[username]}      
-            id=1
-            while id in used_ids:
-                    id+=1        
-            return id
-        except(KeyError, TypeError): return 1
+    # def _search_next_id(self,username):
+    #     messages=self._load_messages()
+    #     try:
+    #         used_ids={list_element["id_msg"] for list_element in messages[username]}      
+    #         id=1
+    #         while id in used_ids:
+    #                 id+=1        
+    #         return id
+    #     except(KeyError, TypeError): return 1
 
-    def _count_message_num(self,message):
-        return len(message)
+    def _count_message_num(self,user_id):
+        return self.database.msg_count(user_id)
 
     def number_message(self,user_id):
-        f_message=self._load_messages()
-        try:
-            file_u=f_message[str(user_id)]    
-            _num=self._count_message_num(file_u)   
+            _num=self._count_message_num(user_id)   
             if _num<self.max_messages:
                 return f"You have {_num} messages" 
+            elif _num==0:
+                return "You don't have messages" 
             else: return f"You have {_num} messages. Your box messages is full. Please delete messages using del command"
-        except KeyError: return "You don't have messages"
 
     def read_message_all(self,Umenager:UM,user_id=None):
         messages=self._load_messages()

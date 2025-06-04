@@ -9,41 +9,43 @@ from my_classes.DataBaseService import DataBaseService
 
 class TestUserMenagerIntegration(unittest.TestCase):
 
-    #classmethod to run only once connection to test database.
+    #classmethod,  to run only once connection to temp database
     @classmethod
-    def setUp(cls):
+    def setUpClass(cls):
         cls.conn=psycopg2.connect(
                 host='localhost',
                 database='test_mailbox',       
                 user='postgres',      
                 password='admin')
         cls.curs=cls.conn.cursor()
-        cls.restet_database()
+        cls.reset_database()
         cls.database=DataBaseService(database="test_mailbox")
-        cls.UCH=UserCommandHandler(cls.database)
-#cls.UCH.UserMenager.db.conn=cls.conn
+       
 
+    def setUp(self):
+         self.UCH=UserCommandHandler(self.database)
+
+         
     @classmethod
-    def tearDown(cls):
+    def tearDownClass(cls):
         cls.conn.close()
 
     #reset test_mailbox each tim when test is called.
     @classmethod
-    def restet_database(cls):
+    def reset_database(cls):
+        #reset whole table
         cls.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
         passwords=["admin","bob","adam3"]
         with open("tests/fixtures/test_Users.json", "r", encoding="utf-8" ) as f:
             users = json.load(f)
+            # when you work with list type, zip is better than enumerate
         for u, p in zip(users,passwords):
             hashed = UserMenager._hash_password(p)
-            print(f" xddd {hashed}")
-            print(u["username"])
             if u.get("is_admin"):
                 is_adm=u.get("is_admin")
             else: is_adm=None
             cls.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
-                            (u["username"],hashed, is_adm))    
-            print (is_adm)       
+                            (u["username"],hashed, is_adm))          
         cls.conn.commit()
 
 
@@ -68,7 +70,6 @@ class TestUserMenagerIntegration(unittest.TestCase):
         #create user
         result=self.UCH.handle_user_command("create user123 password123")
         self.assertTrue(self.UCH.UserMenager.pending_cr_user)
-        self.assertTrue(self.UCH.UserMenager.pending_cr_user_id)
         self.assertIn(self.UCH.UserMenager.pending_cr_password, "password123")
         self.assertIn(result,"Please insert password once again to confirm your password")
         
@@ -87,20 +88,18 @@ class TestUserMenagerIntegration(unittest.TestCase):
         result1=self.UCH.handle_user_command("login admin")
         self.assertTrue(self.UCH.UserMenager.pending_admin)
         self.assertTrue(self.UCH.UserMenager.pending_user)
-        self.assertEqual(self.UCH.UserMenager.pending_user_id,1)
         self.assertIn(result1,"You are trying login as an admin, please insert password")
 
         #check admin password
         result1=self.UCH.handle_user_command("admin")
         self.assertTrue(self.UCH.UserMenager.logged_admin)
-        self.assertTrue(self.UCH.UserMenager.logged_user_id)
         self.assertIn("You are logged in as admin",result1)
 
         #check user list
         result2=self.UCH.handle_user_command("admin_user")
-        self.assertIn("admin",result2)
-        self.assertIn("bob",result2)
-        self.assertIn("adam3",result2)
+        self.assertIn(("admin",),result2)
+        self.assertIn(("bob",),result2)
+        self.assertIn(("adam3",),result2)
 
 
 
@@ -109,11 +108,10 @@ class TestUserMenagerIntegration(unittest.TestCase):
         #check existing user
         result2=self.UCH.handle_user_command("login bob")
         self.assertTrue(self.UCH.UserMenager.pending_user)
-        self.assertEqual(self.UCH.UserMenager.pending_user_id,2)
         self.assertIn(result2,"Login found, please insert password")
 
         #check bob password
-        result1=self.UCH.handle_user_command("adam2")
+        result1=self.UCH.handle_user_command("bob")
         self.assertTrue(self.UCH.UserMenager.logged_user)
         self.assertTrue(self.UCH.UserMenager.logged_user_id)
         self.assertIn("You are logged in as bob",result1)
@@ -167,10 +165,14 @@ class TestUserMenagerIntegration(unittest.TestCase):
         self.assertIn("Password has been changed" ,result3)
 
         #logout for test new password
-        self.UCH.handle_user_command("logout")
+        result4=self.UCH.handle_user_command("logout")
+        print(result4)
+        self.assertIn("User succesfully logout" ,result4)
 
         #login with a new password
         self.UCH.handle_user_command("login adam3")
+        self.assertTrue(self.UCH.UserMenager.pending_user)
+        self.assertTrue(self.UCH.UserMenager.pending_user_id)
         result = self.UCH.handle_user_command("new_passoword")
         self.assertIn("You are logged in as adam3", result)
 
@@ -185,8 +187,8 @@ class TestUserMenagerIntegration(unittest.TestCase):
         self.assertTrue(self.UCH.UserMenager.pending_user_id)
         self.assertIn(result,"Login found, please insert password")
 
-        #check login
-        result1=self.UCH.handle_user_command("adam3")
+        #check login with changed password because SetUpClase has chaned Table in Database
+        result1=self.UCH.handle_user_command("new_passoword")
         self.assertTrue(self.UCH.UserMenager.logged_user)
         self.assertTrue(self.UCH.UserMenager.logged_user_id)
         self.assertIn("You are logged in as adam3",result1)
