@@ -1,37 +1,17 @@
-{
-  "1": [
-    {
-      "id_msg": 1,
-      "from": 2,
-      "content": "hello admin, its bob 1 "
-    },
-      {
-      "id_msg":2,
-      "from": 2,
-      "content": "hello admin, its bob 2"
-    },
-      {
-      "id_msg":3,
-      "from": 2,
-      "content": "hello admin, its bob 3"
-    },
-      {
-      "id_msg":4,
-      "from": 2,
-      "content": "hello admin, its bob 4"
-    }
-    ,  {
-      "id_msg":5,
-      "from": 2,
-      "content": "hello admin, its bob 5"
-    }
-  ],
-  "2": [
-    {
-      "id_msg": 1,
-      "from": 1,
-      "content": "hello bob it's admin"
-    }
-  ],
-  "3": []
-}
+[
+  {
+    "receiver": 1,
+    "sender" :4,
+    "content" :"HElloo 1 it's 4"
+  },
+  {
+    "receiver": 3,
+    "sender" :4,
+    "content" :"HElloo 3 it's 4"
+  },
+  {
+    "receiver": 4,
+    "sender" :1,
+    "content" :"HElloo 4 it's 1"
+  }
+]

@@ -120,11 +120,38 @@ class DataBaseService():
 
     def msg_count(self,id_user:int):
         self.curr.execute("""
-    SELECT COUNT(*) FROM messages WHERE receiver_id=%s;""",(id_user,))
+        SELECT COUNT(*) FROM messages WHERE receiver_id=%s;""",(id_user,))
         result=self.curr.fetchone()
-        if result:
-            return (result[0])
-        else: return "NIC"
+        return (result[0])
+    
+    def load_message(self):
+        """
+        Returns: list with messages
+        """
+        self.curr.execute("""
+        SELECT 
+        messages.id,
+        us.username AS sender_name,
+        ur.username AS receiver_name,
+        messages.message,
+        messages.timestamp
+        FROM messages
+        JOIN users AS us ON messages.sender_id = us.id
+        JOIN users AS ur ON messages.receiver_id = ur.id;
+        """)
+        data=self.curr.fetchall()
+        result=[]
+        for m in data:
+            id=m[0]
+            receiver=m[1]
+            sender=m[2]
+            content=m[3]
+            time=m[4]
+            message=f"""Message number:{id}\nfrom: {sender}\ntime: {time.strftime("%Y-%m-%d %H:%M:%S")}\n{content}\n\n"""
+            result.append(message)
+        return result
+        
+
 
 
 

@@ -9,9 +9,9 @@ class MessagingService():
 
         self.max_messages=5
 
-    # def _load_messages(self):
-    #     with open(self.f_message, 'r', encoding='utf-8') as f:
-    #         return json.load(f)
+    def _load_messages(self,id):
+        with open(self.f_message, 'r', encoding='utf-8') as f:
+            return json.load(f)
 
     # def _save_messages(self, data):
     #     with open(self.f_message, 'w', encoding='utf-8') as f:

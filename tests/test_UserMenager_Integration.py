@@ -1,8 +1,6 @@
 import unittest
 import psycopg2
-#import tempfile
 import json
-#import os
 from my_classes.UserCommandHandler import UserCommandHandler
 from my_classes.UserMenager import UserMenager
 from my_classes.DataBaseService import DataBaseService
@@ -45,7 +43,19 @@ class TestUserMenagerIntegration(unittest.TestCase):
                 is_adm=u.get("is_admin")
             else: is_adm=None
             cls.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
-                            (u["username"],hashed, is_adm))          
+                            (u["username"],hashed, is_adm)) 
+
+        ### messages
+        cls.curs.execute("TRUNCATE TABLE messages RESTART IDENTITY CASCADE;")
+        with open("tests/fixtures/test_Messages.json", "r", encoding="utf-8" ) as f:
+            messages = json.load(f)
+            for m in messages:
+                receiver_id=m.get("receiver")
+                sender_id=m.get("sender")
+                content=m.get("content")
+                cls.curs.execute(""" INSERT INTO messages (receiver_id, sender_id, message) VALUES (%s,%s,%s);""", 
+                            (receiver_id,sender_id, content))
+                
         cls.conn.commit()
 
 
