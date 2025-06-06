@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.errors import UniqueViolation
 from psycopg2.extensions import connection as Psycopg2Connection
+from datetime import datetime
 
 class DataBaseService():
     def __init__(self,host:str='localhost',database:str="mailbox", user:str="postgres", password:str="admin" ):
@@ -38,7 +39,9 @@ class DataBaseService():
                           timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
                            """)
         self.conn.commit() 
-
+    
+    def _format_messages(self,id:int,sender:int,time:datetime,content):
+        return f"""Message number:{id}\nfrom: {sender}\ntime: {time}\n{content}\n"""
 
     def test(self):
         self.curr.execute(f"SELECT * FROM users")
@@ -124,7 +127,7 @@ class DataBaseService():
         result=self.curr.fetchone()
         return (result[0])
     
-    def load_message(self):
+    def load_message(self,id_reciver):
         """
         Returns: list with messages
         """
@@ -137,20 +140,33 @@ class DataBaseService():
         messages.timestamp
         FROM messages
         JOIN users AS us ON messages.sender_id = us.id
-        JOIN users AS ur ON messages.receiver_id = ur.id;
-        """)
+        JOIN users AS ur ON messages.receiver_id = ur.id
+        WHERE ur.id=%s;
+        """,(id_reciver,))
+
         data=self.curr.fetchall()
         result=[]
-        for m in data:
-            id=m[0]
-            receiver=m[1]
-            sender=m[2]
-            content=m[3]
-            time=m[4]
-            message=f"""Message number:{id}\nfrom: {sender}\ntime: {time.strftime("%Y-%m-%d %H:%M:%S")}\n{content}\n\n"""
+        for id,sender,receiver,content,time in data:
+            time=time.strftime("%Y-%m-%d %H:%M:%S")
+            message=self._format_messages(id,sender,content,time)
             result.append(message)
         return result
-        
+    
+
+    def write_message(self,receiver:int,sender:int,content:str):
+        """
+        Inputs: receiver id,sender id ,content of message
+        Returns:
+           True if message is write in database,
+            otherwise False
+        """
+        try:
+            self.curr.execute("""
+        INSERT INTO messages (receiver_id, sender_id,message) VALUES (%s,%s,%s);""", (receiver,sender,content))                                 
+            self.conn.commit()   
+            return True
+        except: return False
+
 
 
 

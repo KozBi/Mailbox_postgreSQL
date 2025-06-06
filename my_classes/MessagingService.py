@@ -5,27 +5,16 @@ from my_classes.DataBaseService import DataBaseService
 class MessagingService():
     def __init__(self,database:DataBaseService):
         self.database=database 
-        self._write_m_tpl=None #wrtie message tuple - help variable for write message
+        self._write_m_tpl=None #wrtie message tuple (user_id,_receiver)# - help variable for write message
 
         self.max_messages=5
 
     def _load_messages(self,id):
-        with open(self.f_message, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        return self.database.load_message(id)
 
     # def _save_messages(self, data):
     #     with open(self.f_message, 'w', encoding='utf-8') as f:
     #         json.dump(data, f, indent=2, ensure_ascii=False)
-
-    # def _search_next_id(self,username):
-    #     messages=self._load_messages()
-    #     try:
-    #         used_ids={list_element["id_msg"] for list_element in messages[username]}      
-    #         id=1
-    #         while id in used_ids:
-    #                 id+=1        
-    #         return id
-    #     except(KeyError, TypeError): return 1
 
     def _count_message_num(self,user_id):
         return self.database.msg_count(user_id)
@@ -39,52 +28,47 @@ class MessagingService():
             else: return f"You have {_num} messages. Your box messages is full. Please delete messages using del command"
 
     def read_message_all(self,Umenager:UM,user_id=None):
-        messages=self._load_messages()
-        msgs=""
         if not user_id:
             user_id=Umenager.logged_user_id
         try:
-            u_message=messages[str(user_id)]
-            for t_dict in (u_message):    
-                #String concatenation 
-                msgs+= f"Message number:{t_dict ['id_msg']} from {Umenager.get_user_by_id((t_dict ['from']))}: {t_dict ['content']}\n"    
-            if msgs!="":
-                if self._count_message_num(u_message)>=self.max_messages:
+            messages=self._load_messages(user_id)
+            if messages:
+        #     u_message=messages[str(user_id)]
+                for m in messages:    
+                    #String concatenation
+                    msgs="" 
+                    msgs+= m
+                if len(messages)>=self.max_messages:
                     return f"{msgs} +  Your's box messages is full. Please delete messages using del command"
                 else: return msgs   
             else: return "You dont have any messages"
         except(KeyError): return f"This user doesn't exist:{user_id}"
         
     def receiver_found(self,receiver,Umenager:UM):
-        _receiver=Umenager.get_id_by_user(receiver)
+        _receiverid=Umenager.get_id_by_user(receiver)
         user_id=Umenager.logged_user_id
-        if _receiver:
-            self._write_m_tpl=(user_id,_receiver)
+        if _receiverid:
+            self._write_m_tpl=(user_id,_receiverid)
             return f"User: {receiver} found, please type a message --- max 255 of characters"
         else:
             self._write_m_tpl=None
             return f"{receiver} not found in userlist"
  
-    def write_message(self,sender,receiver,message):
+    def write_message(self,sender_id:int,receiver_id:int,message:str,Umenager:UM):
+        #check if the messesage is not too long
         if len(message) > 255:
             self._write_m_tpl=None
             return "Message too long (max 255 characters)."
-
-        messages_file= self._load_messages()
-        #check if key exist
-        if receiver not in messages_file:
-            messages_file[receiver] = []
-        if self._count_message_num(messages_file[receiver])>=5:
-            self._write_m_tpl=None
-            return "The recipient's message box is full. You cannot send a message"
-        new_message={"id_msg":self._search_next_id(receiver),
-                    "from":sender,
-                    "content":message}              
-        messages_file[receiver].append(new_message)
-
-        self._save_messages(messages_file)
+        # find id
         self._write_m_tpl=None
-        return "Message sent"
+        # count message 
+        if self._count_message_num(receiver_id)>=5:
+            return "The recipient's message box is full. You cannot send a message"
+        # try to create a message
+        if  self.database.write_message(receiver_id,sender_id,message):        
+            return "Message sent"
+        else: return "Something goes wrong"       
+            
 
     def delete_message(self,id,Umenager:UM,username=None):
         data = self._load_messages()
@@ -107,7 +91,7 @@ class MessagingService():
     def handle_message_command(self,command,UserMenage:UM):
 
         if self._write_m_tpl:
-            return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command)
+            return self.write_message(self._write_m_tpl[0],self._write_m_tpl[1],command,UserMenage)
 
         parts=command.split() #split string
         

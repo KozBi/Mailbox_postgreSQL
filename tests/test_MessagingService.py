@@ -1,32 +1,64 @@
 import unittest
-import tempfile
+import psycopg2
 import json
-import os
-
+from my_classes.DataBaseService import DataBaseService
 from my_classes.MessagingService import MessagingService
 from my_classes.UserMenager import UserMenager
 
 class Test(unittest.TestCase):
 
+    #classmethod,  to run only once connection to temp database
+    @classmethod
+    def setUpClass(cls):
+        cls.conn=psycopg2.connect(
+                host='localhost',
+                database='test_mailbox',       
+                user='postgres',      
+                password='admin')
+        cls.curs=cls.conn.cursor()
+        cls.reset_database()
+        cls.database=DataBaseService(database="test_mailbox")
+       
+
     def setUp(self):
-        #create object but json file is a test file
-        self.service=MessagingService("tests/fixtures/test_Messages.json")
-        self.user=UserMenager()
-        # file is only read, not temporary file requiered
-        self.user.userfile="tests/fixtures/test_Users.json"
+        self.service=MessagingService(self.database)
+        self.user=UserMenager(self.database)
 
-        #create temporary file with a messages
-        with open("tests/fixtures/test_Messages.json", 'r',encoding='utf-8') as f:
-            data=json.load(f)
-        self.temp_file_msg = tempfile.NamedTemporaryFile(mode="w+", delete=False)
-        json.dump(data, self.temp_file_msg)
-        self.temp_file_msg.close()
+         
+    @classmethod
+    def tearDownClass(cls):
+        cls.conn.close()
 
-        self.service.f_message=self.temp_file_msg.name
+    #reset test_mailbox each tim when test is called.
+    @classmethod
+    def reset_database(cls):
+        #reset whole table
+        cls.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
+        passwords=["admin","bob","adam3"]
+        with open("tests/fixtures/test_Users.json", "r", encoding="utf-8" ) as f:
+            users = json.load(f)
+            # when you work with list type, zip is better than enumerate
+        for u, p in zip(users,passwords):
+            hashed = UserMenager._hash_password(p)
+            if u.get("is_admin"):
+                is_adm=u.get("is_admin")
+            else: is_adm=None
+            cls.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
+                            (u["username"],hashed, is_adm)) 
 
-    def tearDown(self):      
-        # Delte file after test function
-        os.remove(self.temp_file_msg.name)
+        ### messages
+        cls.curs.execute("TRUNCATE TABLE messages RESTART IDENTITY CASCADE;")
+        with open("tests/fixtures/test_Messages.json", "r", encoding="utf-8" ) as f:
+            messages = json.load(f)
+            for m in messages:
+                receiver_id=m.get("receiver")
+                sender_id=m.get("sender")
+                content=m.get("content")
+                cls.curs.execute(""" INSERT INTO messages (receiver_id, sender_id, message) VALUES (%s,%s,%s);""", 
+                            (receiver_id,sender_id, content))
+                
+        cls.conn.commit()
+
 
     def test_number_of_messages(self):   
         #max messages

@@ -2,6 +2,6 @@ from DataBaseService import DataBaseService
 
 db = DataBaseService(database="test_mailbox")   
 
-xx=db.load_message()
-for x in xx:
-    print(x)
+xx=db.load_message(1)
+if xx:
+        print(xx[0])

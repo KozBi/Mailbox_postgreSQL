@@ -1,11 +1,13 @@
 import unittest
 from datetime import datetime
 from my_classes.CommandRouter import CommandRouter
+from my_classes.DataBaseService import DataBaseService
 
 class TestCommandRouter (unittest.TestCase):
     
     def setUp(self):
-        self.router=CommandRouter("x.x.x", datetime(2024, 1, 1, 12, 0, 0))
+        self.database=DataBaseService(database="test_mailbox")
+        self.router=CommandRouter("x.x.x", datetime(2024, 1, 1, 12, 0, 0),self.database)
 
     def test_info_command(self):
         result=self.router.handle_command("info")
