@@ -12,10 +12,6 @@ class MessagingService():
     def _load_messages(self,id):
         return self.database.load_message(id)
 
-    # def _save_messages(self, data):
-    #     with open(self.f_message, 'w', encoding='utf-8') as f:
-    #         json.dump(data, f, indent=2, ensure_ascii=False)
-
     def _count_message_num(self,user_id):
         return self.database.msg_count(user_id)
 
@@ -70,23 +66,17 @@ class MessagingService():
         else: return "Something goes wrong"       
             
 
-    def delete_message(self,id,Umenager:UM,username=None):
-        data = self._load_messages()
-        new_data=[]
+    def delete_message(self,id:int,Umenager:UM,username=None):
         if not username:
-            username=str(Umenager.logged_user_id)
-        if username in data:
-            if id=="-a":
-                new_data=[]
-            else:
-                for msg in data[username]:
-                    if str(msg['id_msg']) != id:
-                        new_data.append(msg)
-            data[username]=new_data
-            self._save_messages(data)
-            if id=="-a":
+            username=Umenager.logged_user_id
+        if id=="-a":
+            if self.database.delete_all_message(username):
                 return f"All messages has been deleted"
-            return f"Message {id} has been deleted"
+            else: return "Something goes wrong"   
+        else:
+            if self.database.delete_one_message(id):
+                return f"Message {id} has been deleted"
+            else: return "Something goes wrong"
 
     def handle_message_command(self,command,UserMenage:UM):
 
@@ -125,7 +115,8 @@ class MessagingService():
             if parts[0]=="admin_del" and len(parts)>2:
                 who=UserMenage.get_id_by_user(parts[1])
                 if who:
-                    return self.delete_message(parts[2],UserMenage,who)
+                    result=self.delete_message(parts[2],UserMenage,who)
+                    return result
                 else: return "This user doesn't exist"
             elif parts[0]=="admin_del":
                 return "admin_del-- admin_del 'username' 'message_number_to_delete - ['-a' delete all message]"

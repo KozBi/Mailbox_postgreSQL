@@ -4,6 +4,7 @@ import json
 from my_classes.DataBaseService import DataBaseService
 from my_classes.MessagingService import MessagingService
 from my_classes.UserMenager import UserMenager
+import os
 
 class Test(unittest.TestCase):
 
@@ -17,10 +18,10 @@ class Test(unittest.TestCase):
                 password='admin')
         cls.curs=cls.conn.cursor()
         cls.reset_database()
-        cls.database=DataBaseService(database="test_mailbox")
-       
+        cls.database=DataBaseService(database="test_mailbox") 
+        
 
-    def setUp(self):
+    def setUp(self):   
         self.service=MessagingService(self.database)
         self.user=UserMenager(self.database)
 
@@ -78,6 +79,7 @@ class Test(unittest.TestCase):
         #max messages
         self.user.logged_user='admin'
         self.user.logged_user_id=1
+        self.user.logged_admin=True
         result=self.service.handle_message_command("rd",self.user)
         self.assertIn("Your's box messages is full. Please delete messages using del command",result)
 
@@ -93,44 +95,6 @@ class Test(unittest.TestCase):
         result=self.service.handle_message_command("rd",self.user)
         self.assertIn(result,"You dont have any messages")
 
-    def test_write_and_read_message(self):
-
-        #login as a bob for a tests
-        self.user.logged_user='bob'
-        self.user.logged_user_id=2
-
-        #write a new message
-        result=self.service.handle_message_command("w adam3",self.user)
-        self.assertIn("found, please type a message --- max 255 of characters",result)
-        result=self.service.handle_message_command("Test new message xyz",self.user)
-        self.assertIn(result,"Message sent")
-
-        #login as a bob for a tests
-        self.user.logged_user='adam3'
-        self.user.logged_user_id=3
-
-        #check if messages is saved
-        result=self.service.handle_message_command("rd",self.user)
-        self.assertIn("Test new message xyz",result)
-
-    def test_delete_message(self):
-        #login as a bob for a tests
-        self.user.logged_user='bob'
-        self.user.logged_user_id=2
-
-        #no message number specified
-        result=self.service.handle_message_command("del",self.user)
-        self.assertIn("Wrong parameter",result)
-
-        #delete 1 message
-        result=self.service.handle_message_command("del 2",self.user)
-        self.assertIn("Message 2 has been deleted",result)
-
-        #no message number specified
-        result=self.service.handle_message_command("del -a",self.user)
-        self.assertIn("All messages has been deleted",result)
-
-    
     def test_admin_rd(self):
         #login as a admin for a tests
         self.user.logged_user='admin'
@@ -150,6 +114,47 @@ class Test(unittest.TestCase):
         result=self.service.handle_message_command("admin_rd",self.user)
         self.assertIn("Please eneter username ",result)
 
+    def test_write_and_read_message(self):
+
+        #login as a bob for a tests
+        self.user.logged_user='bob'
+        self.user.logged_user_id=2
+        self.user.logged_admin=False
+
+        #write a new message
+        result=self.service.handle_message_command("w adam3",self.user)
+        self.assertIn("found, please type a message --- max 255 of characters",result)
+        result=self.service.handle_message_command("Test new message xyz",self.user)
+        self.assertIn(result,"Message sent")
+
+        #login as a bob for a tests
+        self.user.logged_user='adam3'
+        self.user.logged_user_id=3
+
+        #check if messages is saved
+        result=self.service.handle_message_command("rd",self.user)
+        self.assertIn("Test new message xyz",result)
+
+
+    def test_delete_message(self):
+        #login as a bob for a tests
+        self.user.logged_user='bob'
+        self.user.logged_user_id=2
+
+        #no message number specified
+        result=self.service.handle_message_command("del",self.user)
+        self.assertIn("Wrong parameter",result)
+
+        #delete 1 message
+        result=self.service.handle_message_command("del 2",self.user)
+        self.assertIn("Message 2 has been deleted",result)
+
+        #no message number specified
+        result=self.service.handle_message_command("del -a",self.user)
+        self.assertIn("All messages has been deleted",result)
+
+
+
     def test_admin_del(self):
         #login as a admin for a tests
         self.user.logged_user='admin'
@@ -157,6 +162,7 @@ class Test(unittest.TestCase):
         self.user.logged_admin=True
 
         result=self.service.handle_message_command("admin_del admin 1",self.user)
+        print(result)
         self.assertIn("Message 1 has been deleted",result)
 
         result=self.service.handle_message_command("admin_del bob -a",self.user)
@@ -168,5 +174,3 @@ class Test(unittest.TestCase):
         result=self.service.handle_message_command("admin_del bob",self.user)
         self.assertIn("['-a' delete all message]",result)
     
-if __name__ == '__main__':
-    unittest.main()

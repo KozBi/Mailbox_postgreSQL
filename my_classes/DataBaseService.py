@@ -43,10 +43,10 @@ class DataBaseService():
     def _format_messages(self,id:int,sender:int,time:datetime,content):
         return f"""Message number:{id}\nfrom: {sender}\ntime: {time}\n{content}\n"""
 
-    def test(self):
-        self.curr.execute(f"SELECT * FROM users")
-        data=self.curr.fetchall()
-        return data
+    # def test(self):
+    #     self.curr.execute(f"SELECT * FROM users")
+    #     data=self.curr.fetchall()
+    #     return data
     
     def create_user_check(self,username:str):
         self.curr.execute("""
@@ -102,11 +102,13 @@ class DataBaseService():
         
     def get_id_by_user(self,username:str):
         """
-        Returns: int
+        Returns: int or False if user not found
             """
-        self.curr.execute("""SELECT id from users where username=%s;""",(username,))
-        result=self.curr.fetchone()
-        return result[0]
+        try:
+            self.curr.execute("""SELECT id from users where username=%s;""",(username,))
+            result=self.curr.fetchone()
+            return result[0]
+        except: return False
     
     def get_user_by_id(self,id:int):
         self.curr.execute("""SELECT username from users where id=%s;""",(id,))
@@ -129,7 +131,8 @@ class DataBaseService():
     
     def load_message(self,id_reciver):
         """
-        Returns: list with messages
+        Input receiver_id
+        Returns: list with messages for defined user if not found None
         """
         self.curr.execute("""
         SELECT 
@@ -163,6 +166,33 @@ class DataBaseService():
         try:
             self.curr.execute("""
         INSERT INTO messages (receiver_id, sender_id,message) VALUES (%s,%s,%s);""", (receiver,sender,content))                                 
+            self.conn.commit()   
+            return True
+        except: return False
+
+    def delete_all_message(self,user:int):
+        """
+        Inputs: user id,
+        Returns:
+            Delete all messages for definied user
+        """
+        try:
+            self.curr.execute("""
+        DELETE FROM messages WHERE receiver_id=%s;""", (user,))                                 
+            self.conn.commit()   
+            return True
+        except: return False
+
+        
+    def delete_one_message(self,id:int):
+        """
+        Inputs: id_message
+        Returns:
+            Delete the message with the given id 
+        """
+        try:
+            self.curr.execute("""
+        DELETE FROM messages WHERE id=%s;""", (id,))                                 
             self.conn.commit()   
             return True
         except: return False
