@@ -4,7 +4,6 @@ import json
 from my_classes.DataBaseService import DataBaseService
 from my_classes.MessagingService import MessagingService
 from my_classes.UserMenager import UserMenager
-import os
 
 class Test(unittest.TestCase):
 
@@ -17,11 +16,11 @@ class Test(unittest.TestCase):
                 user='postgres',      
                 password='admin')
         cls.curs=cls.conn.cursor()
-        cls.reset_database()
-        cls.database=DataBaseService(database="test_mailbox") 
         
-
+    
     def setUp(self):   
+        self.database=DataBaseService(database="test_mailbox")
+        self.reset_database()
         self.service=MessagingService(self.database)
         self.user=UserMenager(self.database)
 
@@ -31,10 +30,9 @@ class Test(unittest.TestCase):
         cls.conn.close()
 
     #reset test_mailbox each tim when test is called.
-    @classmethod
-    def reset_database(cls):
+    def reset_database(self):
         #reset whole table
-        cls.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
+        self.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
         passwords=["admin","bob","adam3"]
         with open("tests/fixtures/test_Users.json", "r", encoding="utf-8" ) as f:
             users = json.load(f)
@@ -44,21 +42,21 @@ class Test(unittest.TestCase):
             if u.get("is_admin"):
                 is_adm=u.get("is_admin")
             else: is_adm=None
-            cls.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
+            self.curs.execute(""" INSERT INTO users (username, password_hash, is_admin) VALUES (%s,%s,%s);""", 
                             (u["username"],hashed, is_adm)) 
 
         ### messages
-        cls.curs.execute("TRUNCATE TABLE messages RESTART IDENTITY CASCADE;")
+        self.curs.execute("TRUNCATE TABLE messages RESTART IDENTITY CASCADE;")
         with open("tests/fixtures/test_Messages.json", "r", encoding="utf-8" ) as f:
             messages = json.load(f)
             for m in messages:
                 receiver_id=m.get("receiver")
                 sender_id=m.get("sender")
                 content=m.get("content")
-                cls.curs.execute(""" INSERT INTO messages (receiver_id, sender_id, message) VALUES (%s,%s,%s);""", 
+                self.curs.execute(""" INSERT INTO messages (receiver_id, sender_id, message) VALUES (%s,%s,%s);""", 
                             (receiver_id,sender_id, content))
                 
-        cls.conn.commit()
+        self.conn.commit()
 
 
     def test_number_of_messages(self):   

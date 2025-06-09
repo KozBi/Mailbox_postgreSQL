@@ -16,20 +16,17 @@ class TestUserMenagerIntegration(unittest.TestCase):
                 user='postgres',      
                 password='admin')
         cls.curs=cls.conn.cursor()
-        cls.reset_database()
-        cls.database=DataBaseService(database="test_mailbox")
-       
 
     def setUp(self):
-         self.UCH=UserCommandHandler(self.database)
-
-         
+        self.database=DataBaseService(database="test_mailbox")
+        self.reset_database()
+        self.UCH=UserCommandHandler(self.database)
+       
     @classmethod
     def tearDownClass(cls):
         cls.conn.close()
 
     #reset test_mailbox each tim when test is called.
-    @classmethod
     def reset_database(cls):
         #reset whole table
         cls.curs.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
@@ -198,7 +195,7 @@ class TestUserMenagerIntegration(unittest.TestCase):
         self.assertIn(result,"Login found, please insert password")
 
         #check login with changed password because SetUpClase has chaned Table in Database
-        result1=self.UCH.handle_user_command("new_passoword")
+        result1=self.UCH.handle_user_command("adam3")
         self.assertTrue(self.UCH.UserMenager.logged_user)
         self.assertTrue(self.UCH.UserMenager.logged_user_id)
         self.assertIn("You are logged in as adam3",result1)
