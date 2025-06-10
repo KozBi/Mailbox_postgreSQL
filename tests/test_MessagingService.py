@@ -87,6 +87,13 @@ class Test(unittest.TestCase):
         result=self.service.handle_message_command("rd",self.user)
         self.assertIn("hello bob it's admin",result)
 
+        #last message
+        self.user.logged_user='admin'
+        self.user.logged_user_id=1
+        self.user.logged_admin=True
+        result=self.service.handle_message_command("rd",self.user)
+        self.assertIn("HElloo 1 it's 2 Messagne number 3",result)
+
         #no message
         self.user.logged_user='adam3'
         self.user.logged_user_id=3

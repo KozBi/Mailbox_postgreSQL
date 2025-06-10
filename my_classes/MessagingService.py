@@ -1,5 +1,6 @@
 from my_classes.UserMenager import UserMenager as UM
 from my_classes.DataBaseService import DataBaseService
+import os
 
 
 class MessagingService():
@@ -28,12 +29,12 @@ class MessagingService():
             user_id=Umenager.logged_user_id
         try:
             messages=self._load_messages(user_id)
+            msgs="\n" 
             if messages:
         #     u_message=messages[str(user_id)]
                 for m in messages:    
                     #String concatenation
-                    msgs="" 
-                    msgs+= m
+                    msgs+= f"{m}\n"
                 if len(messages)>=self.max_messages:
                     return f"{msgs} +  Your's box messages is full. Please delete messages using del command"
                 else: return msgs   
