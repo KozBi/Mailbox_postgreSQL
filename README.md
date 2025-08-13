@@ -44,3 +44,6 @@ Integration scenarios (e.g. full user workflows)
 
 ✅ Tests run against a dedicated PostgreSQL test database (test_mailbox), isolated from production data.
 All data is reset before each test using SQL TRUNCATE statements and reloaded from JSON fixtures to ensure consistent, repeatable test runs.
+
+Youtube video:
+https://www.youtube.com/watch?v=mvFl6O87JAg
